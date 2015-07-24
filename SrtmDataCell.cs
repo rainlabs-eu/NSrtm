@@ -24,7 +24,7 @@
 using System;
 using System.IO;
 
-namespace Alpinechough.Srtm
+namespace NSrtm
 {
 	/// <summary>
 	/// SRTM data cell.
@@ -44,7 +44,7 @@ namespace Alpinechough.Srtm
 		#region Lifecycle
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Alpinechough.Srtm.SrtmDataCell"/> class.
+		/// Initializes a new instance of the <see cref="SrtmDataCell"/> class.
 		/// </summary>
 		/// <param name='filepath'>
 		/// Filepath.
@@ -145,22 +145,24 @@ namespace Alpinechough.Srtm
 		/// Is thrown when an argument passed to a method is invalid because it is outside the allowable range of values as
 		/// specified by the method.
 		/// </exception>
-		public int GetHeight (IGeographicalCoordinates coordinates)
-		{
-			int localLat = (int)((coordinates.Latitude - Latitude) * PointsPerCell);
-			int localLon = (int)(((coordinates.Longitude - Longitude)) * PointsPerCell);
-			int bytesPos = ((PointsPerCell - localLat - 1) * PointsPerCell * 2) + localLon * 2;
 
-			Console.WriteLine (bytesPos);
-			
-			if (bytesPos < 0 || bytesPos > PointsPerCell * PointsPerCell * 2)
-				throw new ArgumentOutOfRangeException ("Coordinates out of range.", "coordinates");
-			
-			// Motorola "big-endian" order with the most significant byte first
-			return (HgtData [bytesPos]) << 8 | HgtData [bytesPos + 1];
-		}
 		
 		#endregion
+
+	    public double GetHeight(double latitude, double longitude)
+	    {
+            int localLat = (int)((latitude - Latitude) * PointsPerCell);
+            int localLon = (int)((longitude - Longitude) * PointsPerCell);
+            int bytesPos = ((PointsPerCell - localLat - 1) * PointsPerCell * 2) + localLon * 2;
+
+            Console.WriteLine(bytesPos);
+
+            if (bytesPos < 0 || bytesPos > PointsPerCell * PointsPerCell * 2)
+                throw new ArgumentOutOfRangeException("Coordinates out of range.", "coordinates");
+
+            // Motorola "big-endian" order with the most significant byte first
+            return (HgtData[bytesPos]) << 8 | HgtData[bytesPos + 1];
+        }
 	}
 }
 

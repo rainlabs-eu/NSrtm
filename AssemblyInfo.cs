@@ -1,3 +1,4 @@
+using System.Resources;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -5,12 +6,12 @@ using System.Runtime.InteropServices;
 // Information about this assembly is defined by the following attributes. 
 // Change them to the values specific to your project.
 
-[assembly: AssemblyTitle("Alpinechough.Srtm")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("NSRMT")]
+[assembly: AssemblyDescription("SRTM API for .NET")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright (c) 2012")]
+[assembly: AssemblyCopyright("Copyright (c) 2012 Alpine Chough Software,  (c) 2015 Rainlabs S.C.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -23,5 +24,6 @@ using System.Runtime.InteropServices;
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.1.*")]
+[assembly: NeutralResourcesLanguage("en")]
+

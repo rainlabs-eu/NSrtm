@@ -1,4 +1,5 @@
 #region MIT License
+
 // MIT License
 // Copyright (c) 2012 Alpine Chough Software.
 //
@@ -19,118 +20,96 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.	
+
 #endregion
 
 using System;
-using System.IO;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 
-namespace Alpinechough.Srtm
+namespace NSrtm
 {
-	/// <summary>
-	/// SRTM Data.
-	/// </summary>
-	/// <exception cref='DirectoryNotFoundException'>
-	/// Is thrown when part of a file or directory argument cannot be found.
-	/// </exception>
-	public class SrtmData
-	{
-		#region Lifecycle
-		
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Alpinechough.Srtm.SrtmData"/> class.
-		/// </summary>
-		/// <param name='dataDirectory'>
-		/// Data directory.
-		/// </param>
-		/// <exception cref='DirectoryNotFoundException'>
-		/// Is thrown when part of a file or directory argument cannot be found.
-		/// </exception>
-		public SrtmData (string dataDirectory)
-		{
-			if (!Directory.Exists (dataDirectory))
-				throw new DirectoryNotFoundException (dataDirectory);
-			
-			DataDirectory = dataDirectory;
-			DataCells = new List<SrtmDataCell> ();
-		}
-		
-		#endregion
-		
-		#region Properties
-		
-		/// <summary>
-		/// Gets or sets the data directory.
-		/// </summary>
-		/// <value>
-		/// The data directory.
-		/// </value>
-		private string DataDirectory { get; set; }
-		
-		/// <summary>
-		/// Gets or sets the SRTM data cells.
-		/// </summary>
-		/// <value>
-		/// The SRTM data cells.
-		/// </value>
-		private List<SrtmDataCell> DataCells { get; set; }
-		
-		#endregion
-		
-		#region Public methods
-		
-		/// <summary>
-		/// Unloads all SRTM data cells.
-		/// </summary>
-		public void Unload ()
-		{
-			DataCells.Clear ();
-		}
-		
-		/// <summary>
-		/// Gets the height.
-		/// </summary>
-		/// <returns>
-		/// The height.
-		/// </returns>
-		/// <param name='coordinates'>
-		/// Coordinates.
-		/// </param>
-		/// <exception cref='Exception'>
-		/// Represents errors that occur during application execution.
-		/// </exception>
-		public int GetHeight (IGeographicalCoordinates coordinates)
-		{
-			int cellLatitude = (int)Math.Floor (Math.Abs (coordinates.Latitude));
-			if (coordinates.Latitude < 0)
-				cellLatitude *= -1;
-			
-			int cellLongitude = (int)Math.Floor (Math.Abs (coordinates.Longitude));
-			if (coordinates.Longitude < 0)
-				cellLongitude *= -1;
+    /// <summary>
+    ///     SRTM Data.
+    /// </summary>
+    public class SrtmData : IElevationProvider
+    {
+        private readonly string _dataDirectory;
+        private readonly ObjectCache _cache;
+        private readonly ConcurrentDictionary<Tuple<int, int>, string> _filePaths = new ConcurrentDictionary<Tuple<int, int>, string>();
+        #region Lifecycle
 
-			SrtmDataCell dataCell = DataCells.Where (dc => dc.Latitude == cellLatitude && dc.Longitude == cellLongitude).FirstOrDefault ();
-			if (dataCell != null)
-				return dataCell.GetHeight (coordinates);
-			
-			string filename = string.Format ("{0}{1:D2}{2}{3:D3}.hgt",
-				cellLatitude < 0 ? "S" : "N",
-				Math.Abs (cellLatitude),
-				cellLongitude < 0 ? "W" : "E",
-				Math.Abs (cellLongitude));
-			
-			string filePath = Path.Combine (DataDirectory, filename);
-			
-			if (!File.Exists (filePath))
-				throw new Exception ("SRTM data cell not found: "+filePath);
-			
-			dataCell = new SrtmDataCell (filePath);
-			DataCells.Add (dataCell);
-			return dataCell.GetHeight (coordinates);
-		}
-		
-		#endregion
-	}
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SrtmData" /> class.
+        /// </summary>
+        /// <param name='dataDirectory'>
+        ///     Data directory.
+        /// </param>
+        /// <param name="cache">Optional argument to override MemoryCache.Default</param>
+        /// <exception cref='DirectoryNotFoundException'>
+        ///     Is thrown when part of a file or directory argument cannot be found.
+        /// </exception>
+        public SrtmData(string dataDirectory, ObjectCache cache = null)
+        {
+            if (dataDirectory == null) throw new ArgumentNullException("dataDirectory");
+
+            if (!Directory.Exists(dataDirectory))
+                throw new DirectoryNotFoundException(dataDirectory);
+
+            _cache = cache ?? MemoryCache.Default;
+
+            _dataDirectory = dataDirectory;
+        }
+
+        #endregion
+
+        #region Public methods
+
+        public double GetElevation(double latitude, double longitude)
+        {
+            int cellLatitude = (int)Math.Floor(Math.Abs(latitude));
+            if (latitude < 0)
+                cellLatitude *= -1;
+
+            int cellLongitude = (int)Math.Floor(Math.Abs(longitude));
+            if (longitude < 0)
+                cellLongitude *= -1;
+
+            var cellId = Tuple.Create(cellLatitude, cellLongitude);
+            string filePath = _filePaths.GetOrAdd(cellId, tpl => buildFilePath(tpl.Item1, tpl.Item2));
+
+            var cell = _cache.Get(filePath) as SrtmDataCell;
+            if (cell == null)
+            {
+                cell = new SrtmDataCell(filePath);
+                var cacheItemPolicy = new CacheItemPolicy
+                                      {
+                                          ChangeMonitors = {new HostFileChangeMonitor(new[] {filePath})}
+                                      };
+                cell = _cache.AddOrGetExisting(filePath, cell, cacheItemPolicy) as SrtmDataCell;
+            }
+
+            if (cell != null)
+                return cell.GetHeight(latitude, longitude);
+            else
+                throw new NotImplementedException();
+        }
+
+        private string buildFilePath(int cellLatitude, int cellLongitude)
+        {
+            string filename = string.Format("{0}{1:D2}{2}{3:D3}.hgt",
+                                            cellLatitude < 0 ? "S" : "N",
+                                            Math.Abs(cellLatitude),
+                                            cellLongitude < 0 ? "W" : "E",
+                                            Math.Abs(cellLongitude));
+
+            string filePath = Path.Combine(_dataDirectory, filename);
+            return filePath;
+        }
+
+        #endregion
+    }
 }
-
