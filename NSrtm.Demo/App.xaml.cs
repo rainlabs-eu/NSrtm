@@ -18,7 +18,7 @@ namespace NSrtm.Demo
             var mainWindow = new MainWindow();
             mainWindow.ElevationProviders = new IElevationProvider[]
                                              {
-                                                 new SrtmData("D:\\SRTM3"),
+                                                 new HgtData("D:\\SRTM3"),
                                              };
             this.MainWindow = mainWindow;
             this.MainWindow.Show();

@@ -24,14 +24,22 @@ namespace NSrtm.Demo
         public IEnumerable<IElevationProvider> ElevationProviders
         {
             get { return ElevationModeCombo.ItemsSource as IEnumerable<IElevationProvider>; }
-            set { ElevationModeCombo.ItemsSource = value; }
+            set
+            {
+                ElevationModeCombo.ItemsSource = value;
+                if (value != null) ElevationModeCombo.SelectedItem = value.FirstOrDefault();
+            }
         }
 
         private void ElevationImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            double latCenter = LatitudeSlider.Value;
-            double range = AreaSlider.Value;
-            double lonCenter = LongitudeSlider.Value;
+            //double latCenter = LatitudeSlider.Value;
+            //double lonCenter = LongitudeSlider.Value;
+            //double range = AreaSlider.Value;
+
+            double latCenter = 27;
+            double lonCenter = -109;
+            double range = 0.1;
 
             double minLat = Math.Max(latCenter - range, -90);
             double maxLat = Math.Min(latCenter + range, 90);
@@ -66,13 +74,12 @@ namespace NSrtm.Demo
             }
 
             var elevationMax = elevations.SelectMany(row => row)
-                      .Max();
+                                         .Max();
 
             var elevationMin = elevations.SelectMany(row => row)
-                      .Min();
+                                         .Min();
 
             var elevationRange = elevationMax - elevationMin;
-
 
             // Reserve the back buffer for updates.
             _writeableBitmap.Lock();
@@ -84,10 +91,10 @@ namespace NSrtm.Demo
 
                 for (int rowIdx = 0; rowIdx < pixelHeightInt; rowIdx++)
                 {
-                    float* row = pBackBuffer + rowIdx * _writeableBitmap.BackBufferStride/sizeof(float);
+                    float* row = pBackBuffer + rowIdx * _writeableBitmap.BackBufferStride / sizeof(float);
                     for (int i = 0; i < pixelWidthInt; i++)
                     {
-                        *row = (elevations[rowIdx][i] - elevationMin)/elevationRange;
+                        *row = (elevations[rowIdx][i] - elevationMin) / elevationRange;
                         row++;
                     }
                 }
