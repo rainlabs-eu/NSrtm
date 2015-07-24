@@ -47,15 +47,15 @@ namespace NSrtm.Core
             var cellId = Tuple.Create(cellLatitude, cellLongitude);
             string filePath = _filePaths.GetOrAdd(cellId, tpl => buildFilePath(tpl.Item1, tpl.Item2));
 
-            var cell = _cache.Get(filePath) as HgtDataCell;
+            var cell = _cache.Get(filePath) as IHgtDataCell;
             if (cell == null)
             {
-                var newCell = HgtDataCell.FromZipFile(filePath);
+                var newCell = HgtDataCell.FromZipFileOrInvalid(filePath);
                 var cacheItemPolicy = new CacheItemPolicy
                                       {
                                           ChangeMonitors = {new HostFileChangeMonitor(new[] {filePath})}
                                       };
-                cell = _cache.AddOrGetExisting(filePath, newCell, cacheItemPolicy) as HgtDataCell;
+                cell = _cache.AddOrGetExisting(filePath, newCell, cacheItemPolicy) as IHgtDataCell;
                 cell = cell ?? newCell;
             }
 

@@ -5,10 +5,31 @@ using System.Linq;
 
 namespace NSrtm.Core
 {
+    public interface IHgtDataCell
+    {
+        double GetElevation(double latitude, double longitude);
+    }
+
+    internal class InvalidHgtDataCell : IHgtDataCell
+    {
+        private static readonly InvalidHgtDataCell invalid = new InvalidHgtDataCell();
+
+        private InvalidHgtDataCell()
+        {
+        }
+
+        public static InvalidHgtDataCell Invalid { get { return invalid; } }
+
+        public double GetElevation(double latitude, double longitude)
+        {
+            return 0xffff;
+        }
+    }
+
     /// <summary>
     ///     SRTM data cell.
     /// </summary>
-    public class HgtDataCell
+    public class HgtDataCell : IHgtDataCell
     {
         private const int srtm3Length = 1201 * 1201 * 2;
         private const int srtm1Length = 3601 * 3601 * 2;
@@ -25,7 +46,20 @@ namespace NSrtm.Core
             _longitudeOffset = longitudeOffset;
         }
 
-        public static HgtDataCell FromHgtFile(string filepath)
+        public double GetElevation(double latitude, double longitude)
+        {
+            int localLat = (int)((latitude - _latitudeOffset) * _pointsPerCell);
+            int localLon = (int)((longitude - _longitudeOffset) * _pointsPerCell);
+            int bytesPos = ((_pointsPerCell - localLat - 1) * _pointsPerCell * 2) + localLon * 2;
+
+            if (bytesPos < 0 || bytesPos > _pointsPerCell * _pointsPerCell * 2)
+                throw new ArgumentException("latitude or longitude out of range");
+
+            // Motorola "big endian" order with the most significant byte first
+            return (_hgtData[bytesPos]) << 8 | _hgtData[bytesPos + 1];
+        }
+
+        public static HgtDataCell FromExistingHgtFile(string filepath)
         {
             if (!File.Exists(filepath))
                 throw new FileNotFoundException(string.Format("File {0} not found.", filepath), filepath);
@@ -51,7 +85,14 @@ namespace NSrtm.Core
             return fromDataAndOffsets(hgtData, latitudeOffset, longitudeOffset);
         }
 
-        public static HgtDataCell FromZipFile(string filepath)
+        public static IHgtDataCell FromZipFileOrInvalid(string filepath)
+        {
+            if (!File.Exists(filepath)) return InvalidHgtDataCell.Invalid;
+
+            return FromExistingZipFile(filepath);
+        }
+
+        public static HgtDataCell FromExistingZipFile(string filepath)
         {
             if (!File.Exists(filepath))
                 throw new FileNotFoundException(string.Format("File {0} not found.", filepath), filepath);
@@ -127,19 +168,6 @@ namespace NSrtm.Core
             longitudeOffset = int.Parse(fileCoordinate[1]);
             if (normalizedFilename.Contains("w"))
                 longitudeOffset *= -1;
-        }
-
-        public double GetElevation(double latitude, double longitude)
-        {
-            int localLat = (int)((latitude - _latitudeOffset) * _pointsPerCell);
-            int localLon = (int)((longitude - _longitudeOffset) * _pointsPerCell);
-            int bytesPos = ((_pointsPerCell - localLat - 1) * _pointsPerCell * 2) + localLon * 2;
-
-            if (bytesPos < 0 || bytesPos > _pointsPerCell * _pointsPerCell * 2)
-                throw new ArgumentException("latitude or longitude out of range");
-
-            // Motorola "big endian" order with the most significant byte first
-            return (_hgtData[bytesPos]) << 8 | _hgtData[bytesPos + 1];
         }
     }
 }
