@@ -1,19 +1,16 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>NuGet.Packager</id>
-    <version>0.1.0</version>
-    <title>NuGet.Packager</title>
+    <id>NSrtm</id>
+    <version>0.1.1-alpha</version>
+    <title>SRTM for .NET</title>
     <authors>Rainlabs S.C.</authors>
     <owners></owners>
     <description>
-      A long description of the package. This shows up in the right pane of the Add Package Dialog as well as in the Package Manager Console when listing packages using the Get-Package command.
+      Library to access SRTM data form .NET
     </description>
     <releaseNotes>
     </releaseNotes>
-    <summary>
-      A short description of the package. If specified, this shows up in the middle pane of the Add Package Dialog. If not specified, a truncated version of the description is used instead.
-    </summary>
     <language>en-US</language>
     <copyright>Copyright 2015</copyright>
     <dependencies></dependencies>
