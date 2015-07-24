@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Specialized;
+using System.Runtime.Caching;
+using System.Windows;
 using NSrtm.Core;
 
 namespace NSrtm.Demo
@@ -7,6 +10,8 @@ namespace NSrtm.Demo
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            if (e == null) throw new ArgumentNullException("e");
+
             base.OnStartup(e);
             var mainWindow = new MainWindow
                              {
