@@ -1,4 +1,5 @@
 #region MIT License
+
 // MIT License
 // Copyright (c) 2012 Alpine Chough Software.
 //
@@ -19,6 +20,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.	
+
 #endregion
 
 using System;
@@ -26,143 +28,80 @@ using System.IO;
 
 namespace NSrtm
 {
-	/// <summary>
-	/// SRTM data cell.
-	/// </summary>
-	/// <exception cref='FileNotFoundException'>
-	/// Is thrown when a file path argument specifies a file that does not exist.
-	/// </exception>
-	/// <exception cref='ArgumentException'>
-	/// Is thrown when an argument passed to a method is invalid.
-	/// </exception>
-	/// <exception cref='ArgumentOutOfRangeException'>
-	/// Is thrown when an argument passed to a method is invalid because it is outside the allowable range of values as
-	/// specified by the method.
-	/// </exception>
-	public class SrtmDataCell
-	{
-		#region Lifecycle
+    /// <summary>
+    ///     SRTM data cell.
+    /// </summary>
+    public class SrtmDataCell
+    {
+        private readonly byte[] _hgtData;
+        private readonly int _pointsPerCell;
+        private readonly int _latitudeOffset;
+        private readonly int _longitudeOffset;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="SrtmDataCell"/> class.
-		/// </summary>
-		/// <param name='filepath'>
-		/// Filepath.
-		/// </param>
-		/// <exception cref='FileNotFoundException'>
-		/// Is thrown when a file path argument specifies a file that does not exist.
-		/// </exception>
-		/// <exception cref='ArgumentException'>
-		/// Is thrown when an argument passed to a method is invalid.
-		/// </exception>
-		public SrtmDataCell (string filepath)
-		{
-			if (!File.Exists (filepath))
-				throw new FileNotFoundException ("File not found.", filepath);
-			
-			if (string.Compare (".hgt", Path.GetExtension (filepath), StringComparison.CurrentCultureIgnoreCase) != 0)
-				throw new ArgumentException ("Invalid extension.", filepath);
-			
-			string filename = Path.GetFileNameWithoutExtension (filepath).ToLower ();
-			string[] fileCoordinate = filename.Split (new [] { 'e', 'w' });
-			if (fileCoordinate.Length != 2)
-				throw new ArgumentException ("Invalid filename.", filepath);
-			
-			fileCoordinate [0] = fileCoordinate [0].TrimStart (new [] { 'n', 's' });
-			
-			Latitude = int.Parse (fileCoordinate [0]);
-			if (filename.Contains ("s"))
-				Latitude *= -1;
-			
-			Longitude = int.Parse (fileCoordinate [1]);
-			if (filename.Contains ("w"))
-				Longitude *= -1;
-			
-			HgtData = File.ReadAllBytes (filepath);
-			
-			switch (HgtData.Length) {
-			case 1201*1201*2: // SRTM-3
-				PointsPerCell = 1201;
-				break;
-			case 3601*3601*2: // SRTM-1
-				PointsPerCell = 3601;
-				break;
-			default:
-				throw new ArgumentException ("Invalid file size.", filepath);
-			}
-		}
-		
-		#endregion
-		
-		#region Properties
-		
-		/// <summary>
-		/// Gets or sets the hgt data.
-		/// </summary>
-		/// <value>
-		/// The hgt data.
-		/// </value>
-		private byte[] HgtData { get; set; }
-		
-		/// <summary>
-		/// Gets or sets the points per cell.
-		/// </summary>
-		/// <value>
-		/// The points per cell.
-		/// </value>
-		private int PointsPerCell { get; set; }
-		
-		/// <summary>
-		/// Gets or sets the latitude of the srtm data file.
-		/// </summary>
-		/// <value>
-		/// The latitude.
-		/// </value>
-		public int Latitude { get; private set; }
-		
-		/// <summary>
-		/// Gets or sets the longitude of the srtm data file.
-		/// </summary>
-		/// <value>
-		/// The longitude.
-		/// </value>
-		public int Longitude { get; private set; }
-		
-		#endregion
-		
-		#region Public Methods
-		
-		/// <summary>
-		/// Gets the height.
-		/// </summary>
-		/// <returns>
-		/// The height.
-		/// </returns>
-		/// <param name='coordinates'>
-		/// Coordinates.
-		/// </param>
-		/// <exception cref='ArgumentOutOfRangeException'>
-		/// Is thrown when an argument passed to a method is invalid because it is outside the allowable range of values as
-		/// specified by the method.
-		/// </exception>
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SrtmDataCell" /> class.
+        /// </summary>
+        /// <param name='filepath'>
+        ///     Filepath.
+        /// </param>
+        /// <exception cref='FileNotFoundException'>
+        ///     Is thrown when a file path argument specifies a file that does not exist.
+        /// </exception>
+        /// <exception cref='ArgumentException'>
+        ///     Is thrown when an argument passed to a method is invalid.
+        /// </exception>
+        public SrtmDataCell(string filepath)
+        {
+            if (!File.Exists(filepath))
+                throw new FileNotFoundException("File not found.", filepath);
 
-		
-		#endregion
+            if (string.Compare(".hgt", Path.GetExtension(filepath), StringComparison.CurrentCultureIgnoreCase) != 0)
+                throw new ArgumentException("Invalid extension.", "filepath");
 
-	    public double GetHeight(double latitude, double longitude)
-	    {
-            int localLat = (int)((latitude - Latitude) * PointsPerCell);
-            int localLon = (int)((longitude - Longitude) * PointsPerCell);
-            int bytesPos = ((PointsPerCell - localLat - 1) * PointsPerCell * 2) + localLon * 2;
+            string filename = Path.GetFileNameWithoutExtension(filepath)
+                                  .ToLower();
+            string[] fileCoordinate = filename.Split('e', 'w');
+            if (fileCoordinate.Length != 2)
+                throw new ArgumentException("Invalid filename.", filepath);
+
+            fileCoordinate[0] = fileCoordinate[0].TrimStart('n', 's');
+
+            _latitudeOffset = int.Parse(fileCoordinate[0]);
+            if (filename.Contains("s"))
+                _latitudeOffset *= -1;
+
+            _longitudeOffset = int.Parse(fileCoordinate[1]);
+            if (filename.Contains("w"))
+                _longitudeOffset *= -1;
+
+            _hgtData = File.ReadAllBytes(filepath);
+
+            switch (_hgtData.Length)
+            {
+                case 1201 * 1201 * 2: // SRTM-3
+                    _pointsPerCell = 1201;
+                    break;
+                case 3601 * 3601 * 2: // SRTM-1
+                    _pointsPerCell = 3601;
+                    break;
+                default:
+                    throw new ArgumentException("Invalid file size.", filepath);
+            }
+        }
+
+        public double GetHeight(double latitude, double longitude)
+        {
+            int localLat = (int)((latitude - _latitudeOffset) * _pointsPerCell);
+            int localLon = (int)((longitude - _longitudeOffset) * _pointsPerCell);
+            int bytesPos = ((_pointsPerCell - localLat - 1) * _pointsPerCell * 2) + localLon * 2;
 
             Console.WriteLine(bytesPos);
 
-            if (bytesPos < 0 || bytesPos > PointsPerCell * PointsPerCell * 2)
-                throw new ArgumentOutOfRangeException("Coordinates out of range.", "coordinates");
+            if (bytesPos < 0 || bytesPos > _pointsPerCell * _pointsPerCell * 2)
+                throw new ArgumentException("latitude or longitude out of range");
 
-            // Motorola "big-endian" order with the most significant byte first
-            return (HgtData[bytesPos]) << 8 | HgtData[bytesPos + 1];
+            // Motorola "big endian" order with the most significant byte first
+            return (_hgtData[bytesPos]) << 8 | _hgtData[bytesPos + 1];
         }
-	}
+    }
 }
-

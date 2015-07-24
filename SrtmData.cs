@@ -109,7 +109,6 @@ namespace NSrtm
             string filePath = Path.Combine(_dataDirectory, filename);
             return filePath;
         }
-
         #endregion
     }
 }
