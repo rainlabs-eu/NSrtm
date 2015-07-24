@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Caching;
 
@@ -67,7 +68,8 @@ namespace NSrtm.Core
 
         private string buildFilePath(int cellLatitude, int cellLongitude)
         {
-            string filename = string.Format("{0}{1:D2}{2}{3:D3}.hgt.zip",
+            string filename = string.Format(CultureInfo.InvariantCulture,
+                                            "{0}{1:D2}{2}{3:D3}.hgt.zip",
                                             cellLatitude < 0 ? "S" : "N",
                                             Math.Abs(cellLatitude),
                                             cellLongitude < 0 ? "W" : "E",

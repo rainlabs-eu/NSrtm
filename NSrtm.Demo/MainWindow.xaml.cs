@@ -11,7 +11,7 @@ using NSrtm.Core;
 
 namespace NSrtm.Demo
 {
-    public partial class MainWindow
+    internal partial class MainWindow
     {
         private readonly WriteableBitmap _writeableBitmap;
 
@@ -79,10 +79,10 @@ namespace NSrtm.Demo
             _writeableBitmap.Unlock();
 
 
-            this.MinElevationLabel.Content = stats.Min;
-            this.MaxElevationLabel.Content = stats.Max;
-            this.ElevationRangeLabel.Content = stats.Range;
-            this.AverageElevationLabel.Content = stats.Average;
+            MinElevationLabel.Content = stats.Min;
+            MaxElevationLabel.Content = stats.Max;
+            ElevationRangeLabel.Content = stats.Range;
+            AverageElevationLabel.Content = stats.Average;
         }
 
         private static Task<ElevationValueStats> elevationStatsAsync(IEnumerable<float> allElevations)

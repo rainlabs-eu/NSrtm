@@ -6,3 +6,4 @@
 *.log
 *.nupkg
 *.exe
+/packages/*

@@ -5,27 +5,6 @@ using System.Linq;
 
 namespace NSrtm.Core
 {
-    public interface IHgtDataCell
-    {
-        double GetElevation(double latitude, double longitude);
-    }
-
-    internal class InvalidHgtDataCell : IHgtDataCell
-    {
-        private static readonly InvalidHgtDataCell invalid = new InvalidHgtDataCell();
-
-        private InvalidHgtDataCell()
-        {
-        }
-
-        public static InvalidHgtDataCell Invalid { get { return invalid; } }
-
-        public double GetElevation(double latitude, double longitude)
-        {
-            return 0xffff;
-        }
-    }
-
     /// <summary>
     ///     SRTM data cell.
     /// </summary>
@@ -38,8 +17,8 @@ namespace NSrtm.Core
         private readonly int _latitudeOffset;
         private readonly int _longitudeOffset;
 
-        public HgtDataCell(byte[] hgtData, int pointsPerCell, int latitudeOffset, int longitudeOffset)
-        {
+        private HgtDataCell(byte[] hgtData, int pointsPerCell, int latitudeOffset, int longitudeOffset)
+        { 
             _hgtData = hgtData;
             _pointsPerCell = pointsPerCell;
             _latitudeOffset = latitudeOffset;
@@ -56,7 +35,10 @@ namespace NSrtm.Core
                 throw new ArgumentException("latitude or longitude out of range");
 
             // Motorola "big endian" order with the most significant byte first
-            return (_hgtData[bytesPos]) << 8 | _hgtData[bytesPos + 1];
+            Int16 elevation = (short)((_hgtData[bytesPos]) << 8 | _hgtData[bytesPos + 1]);
+            if (elevation > short.MinValue)
+                return elevation;
+            else return Double.NaN;
         }
 
         public static HgtDataCell FromExistingHgtFile(string filepath)
@@ -76,7 +58,7 @@ namespace NSrtm.Core
 
             int latitudeOffset;
             int longitudeOffset;
-            LatitudeOffset(normalizedFilename, out latitudeOffset, out longitudeOffset);
+            offsetFromFileName(normalizedFilename, out latitudeOffset, out longitudeOffset);
 
             var hgtData = File.ReadAllBytes(filepath);
             if (hgtData.Length != srtm3Length && hgtData.Length != srtm1Length)
@@ -116,20 +98,24 @@ namespace NSrtm.Core
 
             int latitudeOffset;
             int longitudeOffset;
-            LatitudeOffset(normalizedFilename, out latitudeOffset, out longitudeOffset);
-
-            ZipArchive zipArchive = ZipFile.OpenRead(filepath);
-            var entry = zipArchive.Entries.Single();
-            if (entry.Length != srtm3Length && entry.Length != srtm1Length)
-                throw new ArgumentException(string.Format("Invalid file size ({0} bytes)", entry.Length), "filepath");
+            offsetFromFileName(normalizedFilename, out latitudeOffset, out longitudeOffset);
 
             byte[] hgtData;
-            using (var zipStream = entry.Open())
+            using (var zipArchive = ZipFile.OpenRead(filepath))
             {
-                using (var memory = new MemoryStream())
+                var entry = zipArchive.Entries.Single();
+
+                if (entry.Length != srtm3Length && entry.Length != srtm1Length)
+                    throw new ArgumentException(string.Format("Invalid file size ({0} bytes)", entry.Length), "filepath");
+
+                
+                using (var zipStream = entry.Open())
                 {
-                    zipStream.CopyTo(memory);
-                    hgtData = memory.ToArray();
+                    using (var memory = new MemoryStream())
+                    {
+                        zipStream.CopyTo(memory);
+                        hgtData = memory.ToArray();
+                    }
                 }
             }
             return fromDataAndOffsets(hgtData, latitudeOffset, longitudeOffset);
@@ -147,13 +133,13 @@ namespace NSrtm.Core
                     pointsPerCell = 3601;
                     break;
                 default:
-                    throw new ArgumentException("hgtData");
+                    throw new ArgumentException(string.Format("Unsupported data length {0}", hgtData.Length),"hgtData");
             }
 
             return new HgtDataCell(hgtData, pointsPerCell, latitudeOffset, longitudeOffset);
         }
 
-        private static void LatitudeOffset(string normalizedFilename, out int latitudeOffset, out int longitudeOffset)
+        private static void offsetFromFileName(string normalizedFilename, out int latitudeOffset, out int longitudeOffset)
         {
             string[] fileCoordinate = normalizedFilename.Split('e', 'w');
             if (fileCoordinate.Length != 2)

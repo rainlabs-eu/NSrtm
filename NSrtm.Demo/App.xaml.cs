@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Specialized;
-using System.Runtime.Caching;
 using System.Windows;
+using JetBrains.Annotations;
 using NSrtm.Core;
 
 namespace NSrtm.Demo
 {
-    public partial class App
+    internal partial class App
     {
-        protected override void OnStartup(StartupEventArgs e)
+        protected override void OnStartup([NotNull] StartupEventArgs e)
         {
             if (e == null) throw new ArgumentNullException("e");
 
