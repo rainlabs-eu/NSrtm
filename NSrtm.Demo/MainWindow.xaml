@@ -4,29 +4,44 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow">
-    <StackPanel>
-        <Label Target="{Binding ElementName=ElevationModeCombo}">Elevation Mode:</Label>
-        <ComboBox x:Name="ElevationModeCombo" />
+        Title="NSrtm.Demo">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <Label Target="{Binding ElementName=ElevationModeCombo}">Elevation Mode:</Label>
+            <ComboBox x:Name="ElevationModeCombo" />
 
-        <Label Target="{Binding ElementName=LatitudeSlider}">Latitude:</Label>
-        <DockPanel>
-            <Label Content="{Binding Path=Value, ElementName=LatitudeSlider}" ContentStringFormat="F3" MinWidth="80"
-                   DockPanel.Dock="Right" />
-            <Slider Minimum="-90" Maximum="90" x:Name="LatitudeSlider" Value="0" />
-        </DockPanel>
-        <Label Target="{Binding ElementName=LongitudeSlider}">Longitude:</Label>
-        <DockPanel>
-            <Label Content="{Binding Path=Value, ElementName=LongitudeSlider}" ContentStringFormat="F3" MinWidth="80"
-                   DockPanel.Dock="Right" />
-            <Slider Minimum="-180" Maximum="180" x:Name="LongitudeSlider" Value="0" />
-        </DockPanel>
-        <Label Target="{Binding ElementName=AreaSlider}">Area (degrees for lat long):</Label>
-        <DockPanel>
-            <Label Content="{Binding Path=Value, ElementName=AreaSlider}" ContentStringFormat="F3" MinWidth="80"
-                   DockPanel.Dock="Right" />
-            <Slider Minimum="0.1" Maximum="10" x:Name="AreaSlider" Value="0" />
-        </DockPanel>
-        <Image Width="800" Height="600" x:Name="ElevationImage" />
-    </StackPanel>
+            <Label Target="{Binding ElementName=LatitudeSlider}">Latitude:</Label>
+            <DockPanel>
+                <Label Content="{Binding Path=Value, ElementName=LatitudeSlider}" ContentStringFormat="F3"
+                       MinWidth="80"
+                       DockPanel.Dock="Right" />
+                <Slider Minimum="-90" Maximum="90" x:Name="LatitudeSlider" Value="0" />
+            </DockPanel>
+            <Label Target="{Binding ElementName=LongitudeSlider}">Longitude:</Label>
+            <DockPanel>
+                <Label Content="{Binding Path=Value, ElementName=LongitudeSlider}" ContentStringFormat="F3"
+                       MinWidth="80"
+                       DockPanel.Dock="Right" />
+                <Slider Minimum="-180" Maximum="180" x:Name="LongitudeSlider" Value="0" />
+            </DockPanel>
+            <Label Target="{Binding ElementName=AreaSlider}">Area (degrees for lat long):</Label>
+            <DockPanel>
+                <Label Content="{Binding Path=Value, ElementName=AreaSlider}" ContentStringFormat="F3" MinWidth="80"
+                       DockPanel.Dock="Right" />
+                <Slider Minimum="0.1" Maximum="10" x:Name="AreaSlider" Value="0" />
+            </DockPanel>
+        </StackPanel>
+        <Image Margin="10" x:Name="ElevationImage" Grid.Row="1" />
+        <WrapPanel Grid.Row="2">
+            <Label ContentStringFormat="Min elevation: {0:F1}" x:Name="MinElevationLabel">0</Label>
+            <Label ContentStringFormat="Max elevation: {0:F1}" x:Name="MaxElevationLabel">0</Label>
+            <Label ContentStringFormat="Elevation range: {0:F1}" x:Name="ElevationRangeLabel">0</Label>
+            <Label ContentStringFormat="Average elevation: {0:F1}" x:Name="AverageElevationLabel">0</Label>
+        </WrapPanel>
+    </Grid>
 </Window>

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -17,7 +19,7 @@ namespace NSrtm.Demo
         {
             InitializeComponent();
             ElevationImage.MouseLeftButtonUp += ElevationImage_MouseLeftButtonUp;
-            _writeableBitmap = new WriteableBitmap(800, 600, 96, 96, PixelFormats.Gray32Float, null);
+            _writeableBitmap = new WriteableBitmap(2000, 1000, 96, 96, PixelFormats.Gray32Float, null);
             ElevationImage.Source = _writeableBitmap;
         }
 
@@ -31,23 +33,11 @@ namespace NSrtm.Demo
             }
         }
 
-        private void ElevationImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private async void ElevationImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            //double latCenter = LatitudeSlider.Value;
-            //double lonCenter = LongitudeSlider.Value;
-            //double range = AreaSlider.Value;
-
-            double latCenter = 27;
-            double lonCenter = -109;
-            double range = 0.1;
-
-            double minLat = Math.Max(latCenter - range, -90);
-            double maxLat = Math.Min(latCenter + range, 90);
-            double latRange = maxLat - minLat;
-
-            double minLon = Math.Max(lonCenter - range, -180);
-            double maxLon = Math.Min(lonCenter + range, 180);
-            double lonRange = maxLon - minLon;
+            double latCenter = LatitudeSlider.Value;
+            double lonCenter = LongitudeSlider.Value;
+            double range = AreaSlider.Value;
 
             var ep = ElevationModeCombo.SelectedItem as IElevationProvider;
             if (ep == null)
@@ -57,31 +47,13 @@ namespace NSrtm.Demo
 
             int pixelWidthInt = _writeableBitmap.PixelWidth;
             int pixelHeightInt = _writeableBitmap.PixelHeight;
-            float pixelWidth = pixelWidthInt;
-            float pixelHeight = pixelHeightInt;
 
-            var elevations = new float[pixelHeightInt][];
-            for (int rIdx = 0; rIdx < pixelHeightInt; rIdx++)
-            {
-                elevations[rIdx] = new float[pixelWidthInt];
-                for (int cIdx = 0; cIdx < pixelWidthInt; cIdx++)
-                {
-                    double lat = minLat + rIdx / pixelHeight * latRange;
-                    double lon = minLon + cIdx / pixelWidth * lonRange;
-                    float elevation = (float)ep.GetElevation(lat, lon);
-                    elevations[rIdx][cIdx] = elevation;
-                }
-            }
+            var elevations = await retrieveElevationAsync(ep, pixelHeightInt, pixelWidthInt, latCenter, lonCenter, range);
 
-            var elevationMax = elevations.SelectMany(row => row)
-                                         .Max();
+            var allElevations = elevations.SelectMany(row => row);
 
-            var elevationMin = elevations.SelectMany(row => row)
-                                         .Min();
+            var stats = await elevationStatsAsync(allElevations);
 
-            var elevationRange = elevationMax - elevationMin;
-
-            // Reserve the back buffer for updates.
             _writeableBitmap.Lock();
 
             unsafe
@@ -94,7 +66,7 @@ namespace NSrtm.Demo
                     float* row = pBackBuffer + rowIdx * _writeableBitmap.BackBufferStride / sizeof(float);
                     for (int i = 0; i < pixelWidthInt; i++)
                     {
-                        *row = (elevations[rowIdx][i] - elevationMin) / elevationRange;
+                        *row = (elevations[rowIdx][i] - stats.Min) / stats.Range;
                         row++;
                     }
                 }
@@ -105,6 +77,98 @@ namespace NSrtm.Demo
 
             // Release the back buffer and make it available for display.
             _writeableBitmap.Unlock();
+
+
+            this.MinElevationLabel.Content = stats.Min;
+            this.MaxElevationLabel.Content = stats.Max;
+            this.ElevationRangeLabel.Content = stats.Range;
+            this.AverageElevationLabel.Content = stats.Average;
+        }
+
+        private static Task<ElevationValueStats> elevationStatsAsync(IEnumerable<float> allElevations)
+        {
+            return Task.Run(() => elevationStatsAsyncImpl(allElevations));
+        }
+
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        private static ElevationValueStats elevationStatsAsyncImpl(IEnumerable<float> allElevationsLinear)
+        {
+            var allElevations = allElevationsLinear.AsParallel();
+            float elevationMax = allElevations.Max();
+            float elevationMin = allElevations.Min();
+
+            float elevationDiff = elevationMax - elevationMin;
+            float elevationAvg = allElevations.Average();
+            return new ElevationValueStats(elevationMin, elevationMax, elevationDiff, elevationAvg);
+        }
+
+        private static Task<float[][]> retrieveElevationAsync(
+            IElevationProvider ep,
+            int pixelHeightInt,
+            int pixelWidthInt,
+            double latCenter,
+            double lonCenter,
+            double range)
+        {
+            return Task.Run(() => retrieveElevationAsyncImpl(ep, pixelHeightInt, pixelWidthInt, latCenter, lonCenter, range));
+        }
+
+        private static float[][] retrieveElevationAsyncImpl(
+            IElevationProvider ep,
+            int pixelHeightInt,
+            int pixelWidthInt,
+            double latCenter,
+            double lonCenter,
+            double range)
+        {
+            double minLat = Math.Max(latCenter - range, -90);
+            double maxLat = Math.Min(latCenter + range, 90);
+
+            double minLon = Math.Max(lonCenter - range, -180);
+            double maxLon = Math.Min(lonCenter + range, 180);
+
+            double latRange = maxLat - minLat;
+            double lonRange = maxLon - minLon;
+
+            var rowIndexes = Enumerable.Range(0, pixelHeightInt);
+
+            return rowIndexes
+                .AsParallel().AsOrdered()
+                .Select(rIdx =>
+                        {
+                            double lat = minLat + rIdx * latRange / pixelHeightInt;
+                            return retrieveRowElevation(ep, pixelWidthInt, lat, minLon, lonRange);
+                        })
+                .ToArray();
+        }
+
+        private static float[] retrieveRowElevation(IElevationProvider ep, int pixelWidthInt, double lat, double minLon, double lonRange)
+        {
+            var rowArray = new float[pixelWidthInt];
+
+            for (int cIdx = 0; cIdx < pixelWidthInt; cIdx++)
+            {
+                double lon = minLon + cIdx * lonRange / pixelWidthInt;
+                var elevation = (float)ep.GetElevation(lat, lon);
+                rowArray[cIdx] = elevation;
+            }
+            return rowArray;
+        }
+    }
+
+    internal struct ElevationValueStats
+    {
+        public readonly float Min;
+        public readonly float Max;
+        public readonly float Range;
+        public readonly float Average;
+
+        public ElevationValueStats(float min, float max, float range, float average)
+        {
+            Min = min;
+            Max = max;
+            Range = range;
+            Average = average;
         }
     }
 }
