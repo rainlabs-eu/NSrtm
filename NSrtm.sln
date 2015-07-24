@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSrtm", "NSrtm.csproj", "{CD10A6E7-745F-4C82-9AAB-C5AA90944195}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSrtm.Core", "NSrtm.Core\NSrtm.Core.csproj", "{61F12886-6162-41BD-9DD9-4688B88BF4FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGet.Packager", "NuGet.Packager\NuGet.Packager.csproj", "{0451BAEF-DF2E-4B98-8644-94EE9415E389}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CD10A6E7-745F-4C82-9AAB-C5AA90944195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD10A6E7-745F-4C82-9AAB-C5AA90944195}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD10A6E7-745F-4C82-9AAB-C5AA90944195}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD10A6E7-745F-4C82-9AAB-C5AA90944195}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
