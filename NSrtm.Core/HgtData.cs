@@ -42,9 +42,7 @@ namespace NSrtm.Core
             if (latitude < 0)
                 cellLatitude *= -1;
 
-            int cellLongitude = (int)Math.Floor(Math.Abs(longitude));
-            if (longitude < 0)
-                cellLongitude *= -1;
+            int cellLongitude = (int)Math.Floor(longitude);
 
             var cellId = Tuple.Create(cellLatitude, cellLongitude);
             string filePath = _filePaths.GetOrAdd(cellId, tpl => buildFilePath(tpl.Item1, tpl.Item2));
