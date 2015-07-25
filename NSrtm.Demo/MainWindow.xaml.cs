@@ -1,174 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using NSrtm.Core;
+using JetBrains.Annotations;
+using ReactiveUI;
 
 namespace NSrtm.Demo
 {
-    internal partial class MainWindow
+    internal partial class MainWindow : IViewFor<DemoViewModel>
     {
-        private readonly WriteableBitmap _writeableBitmap;
-
         public MainWindow()
         {
             InitializeComponent();
-            ElevationImage.MouseLeftButtonUp += ElevationImage_MouseLeftButtonUp;
-            _writeableBitmap = new WriteableBitmap(2000, 1000, 96, 96, PixelFormats.Gray32Float, null);
-            ElevationImage.Source = _writeableBitmap;
+
+            this.WhenActivated(onActivation);
         }
 
-        public IEnumerable<IElevationProvider> ElevationProviders
+        [NotNull]
+        private IEnumerable<IDisposable> onActivation()
         {
-            get { return ElevationModeCombo.ItemsSource as IEnumerable<IElevationProvider>; }
-            set
+            yield return this.BindCommand(ViewModel, vm => vm.RetrieveElevationsCommand, v => v.ShowElevationsButton);
+
+            yield return this.OneWayBind(ViewModel, vm => vm.AvailableElevationProviders, v => v.ElevationSourceCombo.ItemsSource);
+            yield return this.Bind(ViewModel, vm => vm.SelectedElevationProvider, v => v.ElevationSourceCombo.SelectedItem);
+
+            yield return this.Bind(ViewModel, vm => vm.CenterLatitude, v => v.LatitudeSlider.Value);
+            yield return this.OneWayBind(ViewModel, vm => vm.CenterLatitude, v => v.LatitudeLabel.Content);
+
+            yield return this.Bind(ViewModel, vm => vm.CenterLongitude, v => v.LongitudeSlider.Value);
+            yield return this.OneWayBind(ViewModel, vm => vm.CenterLongitude, v => v.LongitudeLabel.Content);
+
+            yield return this.Bind(ViewModel, vm => vm.RangeDegree, v => v.DegreeRangeSlider.Value);
+            yield return this.OneWayBind(ViewModel, vm => vm.RangeDegree, v => v.DegreeRangeLabel.Content);
+
+            yield return this.Bind(ViewModel, vm => vm.MinVisualizedHeight, v => v.VisualizedHeightSlider.LowerValue);
+            yield return this.Bind(ViewModel, vm => vm.MaxVisualizedHeight, v => v.VisualizedHeightSlider.UpperValue);
+
+            yield return this.OneWayBind(ViewModel, vm => vm.Progress, v => v.ProgressBar.Value);
+
+            yield return this.OneWayBind(ViewModel, vm => vm.ElevationBitmap, v => v.ElevationImage.Source);
+            yield return this.OneWayBind(ViewModel, vm => vm.ElevationValueStats, v => v.StatisticsTextBlock.Text, stats => stats.ToString());
+
+            yield return UserError.RegisterHandler(ue => Observable.Return(ue)
+                                                                   .ObserveOn(RxApp.MainThreadScheduler)
+                                                                   .Select(AskForUserInput));
+        }
+
+        private RecoveryOptionResult AskForUserInput(UserError ue)
+        {
+            if (ue.InnerException != null) MessageBox.Show(ue.InnerException.Message, ue.ErrorMessage);
+            else
             {
-                ElevationModeCombo.ItemsSource = value;
-                if (value != null) ElevationModeCombo.SelectedItem = value.FirstOrDefault();
+                MessageBox.Show(ue.ErrorMessage);
             }
+            return RecoveryOptionResult.FailOperation;
         }
 
-        private async void ElevationImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            double latCenter = LatitudeSlider.Value;
-            double lonCenter = LongitudeSlider.Value;
-            double range = AreaSlider.Value;
+        #region IViewFor<T> implementation
 
-            var ep = ElevationModeCombo.SelectedItem as IElevationProvider;
-            if (ep == null)
-            {
-                return;
-            }
+        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register("ViewModel",
+                                                                                                  typeof(DemoViewModel),
+                                                                                                  typeof(MainWindow));
 
-            int pixelWidthInt = _writeableBitmap.PixelWidth;
-            int pixelHeightInt = _writeableBitmap.PixelHeight;
+        public DemoViewModel ViewModel { get { return (DemoViewModel)GetValue(ViewModelProperty); } set { SetValue(ViewModelProperty, value); } }
 
-            var elevations = await retrieveElevationAsync(ep, pixelHeightInt, pixelWidthInt, latCenter, lonCenter, range);
+        object IViewFor.ViewModel { get { return ViewModel; } set { ViewModel = (DemoViewModel)value; } }
 
-            var allElevations = elevations.SelectMany(row => row);
-
-            var stats = await elevationStatsAsync(allElevations);
-
-            _writeableBitmap.Lock();
-
-            unsafe
-            {
-                // Get a pointer to the back buffer. 
-                float* pBackBuffer = (float*)_writeableBitmap.BackBuffer;
-
-                for (int rowIdx = 0; rowIdx < pixelHeightInt; rowIdx++)
-                {
-                    float* row = pBackBuffer + rowIdx * _writeableBitmap.BackBufferStride / sizeof(float);
-                    for (int i = 0; i < pixelWidthInt; i++)
-                    {
-                        *row = (elevations[rowIdx][i] - stats.Min) / stats.Range;
-                        row++;
-                    }
-                }
-            }
-
-            // Specify the area of the bitmap that changed.
-            _writeableBitmap.AddDirtyRect(new Int32Rect(0, 0, pixelWidthInt, _writeableBitmap.PixelHeight));
-
-            // Release the back buffer and make it available for display.
-            _writeableBitmap.Unlock();
-
-
-            MinElevationLabel.Content = stats.Min;
-            MaxElevationLabel.Content = stats.Max;
-            ElevationRangeLabel.Content = stats.Range;
-            AverageElevationLabel.Content = stats.Average;
-        }
-
-        private static Task<ElevationValueStats> elevationStatsAsync(IEnumerable<float> allElevations)
-        {
-            return Task.Run(() => elevationStatsAsyncImpl(allElevations));
-        }
-
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static ElevationValueStats elevationStatsAsyncImpl(IEnumerable<float> allElevationsLinear)
-        {
-            var allElevations = allElevationsLinear.AsParallel();
-            float elevationMax = allElevations.Max();
-            float elevationMin = allElevations.Min();
-
-            float elevationDiff = elevationMax - elevationMin;
-            float elevationAvg = allElevations.Average();
-            return new ElevationValueStats(elevationMin, elevationMax, elevationDiff, elevationAvg);
-        }
-
-        private static Task<float[][]> retrieveElevationAsync(
-            IElevationProvider ep,
-            int pixelHeightInt,
-            int pixelWidthInt,
-            double latCenter,
-            double lonCenter,
-            double range)
-        {
-            return Task.Run(() => retrieveElevationAsyncImpl(ep, pixelHeightInt, pixelWidthInt, latCenter, lonCenter, range));
-        }
-
-        private static float[][] retrieveElevationAsyncImpl(
-            IElevationProvider ep,
-            int pixelHeightInt,
-            int pixelWidthInt,
-            double latCenter,
-            double lonCenter,
-            double range)
-        {
-            double minLat = Math.Max(latCenter - range, -90);
-            double maxLat = Math.Min(latCenter + range, 90);
-
-            double minLon = Math.Max(lonCenter - range, -180);
-            double maxLon = Math.Min(lonCenter + range, 180);
-
-            double latRange = maxLat - minLat;
-            double lonRange = maxLon - minLon;
-
-            var rowIndexes = Enumerable.Range(0, pixelHeightInt);
-
-            return rowIndexes
-                .AsParallel().AsOrdered()
-                .Select(rIdx =>
-                        {
-                            double lat = minLat + rIdx * latRange / pixelHeightInt;
-                            return retrieveRowElevation(ep, pixelWidthInt, lat, minLon, lonRange);
-                        })
-                .ToArray();
-        }
-
-        private static float[] retrieveRowElevation(IElevationProvider ep, int pixelWidthInt, double lat, double minLon, double lonRange)
-        {
-            var rowArray = new float[pixelWidthInt];
-
-            for (int cIdx = 0; cIdx < pixelWidthInt; cIdx++)
-            {
-                double lon = minLon + cIdx * lonRange / pixelWidthInt;
-                var elevation = (float)ep.GetElevation(lat, lon);
-                rowArray[cIdx] = elevation;
-            }
-            return rowArray;
-        }
-    }
-
-    internal struct ElevationValueStats
-    {
-        public readonly float Min;
-        public readonly float Max;
-        public readonly float Range;
-        public readonly float Average;
-
-        public ElevationValueStats(float min, float max, float range, float average)
-        {
-            Min = min;
-            Max = max;
-            Range = range;
-            Average = average;
-        }
+        #endregion
     }
 }

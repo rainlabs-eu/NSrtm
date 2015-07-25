@@ -12,15 +12,14 @@ namespace NSrtm.Demo
             if (e == null) throw new ArgumentNullException("e");
 
             base.OnStartup(e);
-            var mainWindow = new MainWindow
-                             {
-                                 ElevationProviders = new IElevationProvider[]
-                                                      {
-                                                          new HgtData("D:\\SRTM3"),
-                                                      }
-                             };
+            var mainWindow = new MainWindow();
             MainWindow = mainWindow;
             MainWindow.Show();
+            mainWindow.ViewModel = new DemoViewModel(new IElevationProvider[]
+                                                     {
+                                                         HgtElevationProvider.CreateInMemoryFromZipFiles("D:\\SRTM3ZIP"),
+                                                         HgtElevationProvider.CreateInMemoryFromRawFiles("D:\\SRTM3HGT"),
+                                                     });
         }
     }
 }

@@ -2,6 +2,9 @@ namespace NSrtm.Core
 {
     public interface IElevationProvider
     {
+        string Name { get; }
+        string Description { get; }
+
         /// <summary>
         /// Gets elevation above MSL
         /// </summary>
