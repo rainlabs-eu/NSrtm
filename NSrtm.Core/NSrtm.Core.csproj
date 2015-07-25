@@ -55,11 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IElevationProvider.cs" />
-    <Compile Include="IHgtDataCell.cs" />
-    <Compile Include="InvalidHgtDataCell.cs" />
+    <Compile Include="Hgt\IHgtDataCell.cs" />
+    <Compile Include="Hgt\InvalidHgtDataCell.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HgtData.cs" />
-    <Compile Include="HgtDataCell.cs" />
+    <Compile Include="Hgt\HgtData.cs" />
+    <Compile Include="Hgt\HgtDataCell.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NSrtm.Core.ruleset" />
