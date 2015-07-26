@@ -1,21 +1,16 @@
 using System;
-using System.Runtime.Caching;
+using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
     public class HgtElevationProvider : IElevationProvider
     {
         private readonly IHgtDataCellFactory _cellFactory;
-        private readonly CacheItemPolicy _policy;
-        private readonly ObjectCache _cache;
 
-        public HgtElevationProvider(IHgtDataCellFactory cellFactory, ObjectCache cache = null, CacheItemPolicy policy = null)
+        public HgtElevationProvider(IHgtDataCellFactory cellFactory)
         {
             if (cellFactory == null) throw new ArgumentNullException("cellFactory");
             _cellFactory = cellFactory;
-            _policy = policy ?? new CacheItemPolicy {SlidingExpiration = TimeSpan.FromSeconds(1)};
-
-            _cache = cache ?? MemoryCache.Default;
         }
 
         public string Name { get; set; }
@@ -23,54 +18,47 @@ namespace NSrtm.Core
 
         public double GetElevation(double latitude, double longitude)
         {
-            HgtCellCoords coords = HgtCellCoords.ForLatLon( latitude,  longitude);
+            HgtCellCoords coords = HgtCellCoords.ForLatLon(latitude, longitude);
 
-            string baseName = coords.ToBaseName();
-            var cell = _cache.Get(baseName) as IHgtDataCell;
-            if (cell == null)
-            {
-                IHgtDataCell newCell;
-                try
-                {
-                    newCell = _cellFactory.GetCellFor(coords);
-                }
-                catch (HgtFileNotFoundException)
-                {
-                    newCell = HgtDataCellInvalid.Invalid;
-                }
-                catch (Exception ex)
-                {
-                    throw new HgtFileException(coords, "Unknown error during cell retrieval", ex);
-                }
-                cell = _cache.AddOrGetExisting(baseName, newCell, _policy) as IHgtDataCell;
-                cell = cell ?? newCell;
-            }
+            var cell = _cellFactory.GetCellFor(coords);
 
-            if (cell != null)
-                return cell.GetElevation(latitude, longitude);
-            else
-                return Double.NaN;
+            return cell.GetElevation(latitude, longitude);
         }
 
-        public static HgtElevationProvider CreateInMemoryFromRawFiles(string directory, ObjectCache cache = null, CacheItemPolicy policy = null)
+        [NotNull]
+        public static IElevationProvider CreateInMemoryFromRawFiles([NotNull] string directory)
         {
             IHgtPathResolver pathResolver = new HgtPathResolverRaw();
             IHgtDataLoader loader = new HgtDataLoaderFromRaw(pathResolver);
-            return new HgtElevationProvider(new HgtDataCellInMemoryFactory(directory, loader), cache, policy)
+            return new HgtElevationProvider(new HgtDataCellInMemoryFactory(directory, loader))
                    {
                        Name = "SRTM files",
                        Description = string.Format("Unpacked SRTM files (HGT) from directory {0}", directory)
                    };
         }
-        public static HgtElevationProvider CreateInMemoryFromZipFiles(string directory, ObjectCache cache = null, CacheItemPolicy policy = null)
+
+        [NotNull]
+        public static IElevationProvider CreateInMemoryFromZipFiles([NotNull] string directory)
         {
             IHgtPathResolver pathResolver = new HgtPathResolverZip();
             IHgtDataLoader loader = new HgtDataLoaderFromZip(pathResolver);
-            return new HgtElevationProvider(new HgtDataCellInMemoryFactory(directory, loader), cache, policy)
-            {
-                Name = "SRTM files",
-                Description = string.Format("ZIP packed SRTM files (HGT.ZIP) from directory {0}", directory)
-            };
+            return new HgtElevationProvider(new HgtDataCellInMemoryFactory(directory, loader))
+                   {
+                       Name = "SRTM files",
+                       Description = string.Format("ZIP packed SRTM files (HGT.ZIP) from directory {0}", directory)
+                   };
+        }
+
+        [NotNull]
+        public static IElevationProvider CreateMemoryMappedFromRawFiles([NotNull] string directory)
+        {
+            IHgtPathResolver pathResolver = new HgtPathResolverRaw();
+
+            return new HgtElevationProvider(new HgtDataCellInMemoryMappedFactory(directory, pathResolver))
+                   {
+                       Name = "SRTM files",
+                       Description = string.Format("Memory mapped SRTM files (HGT) from directory {0}", directory)
+                   };
         }
     }
 }
