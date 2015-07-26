@@ -3,16 +3,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("NSrtm.Core")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Rainlabs")]
-[assembly: AssemblyProduct("NSrtm.Core")]
-[assembly: AssemblyCopyright("Copyright © 2015 Rainlabs S.C.")]
+[assembly: AssemblyDescription("NSrtm.Core allows accessing SRTM data from .NET")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-
-[assembly: ComVisible(false)]
-
-[assembly: CLSCompliant(true)]
-
-[assembly: AssemblyVersion("0.2.0.*")]

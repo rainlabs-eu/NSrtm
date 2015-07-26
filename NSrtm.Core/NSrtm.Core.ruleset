@@ -5,11 +5,14 @@
     <Rule Id="CA1020" Action="None" />
     <Rule Id="CA1026" Action="None" />
     <Rule Id="CA1032" Action="None" />
+    <Rule Id="CA1064" Action="None" />
     <Rule Id="CA1304" Action="None" />
     <Rule Id="CA1305" Action="None" />
     <Rule Id="CA1704" Action="None" />
+    <Rule Id="CA1811" Action="None" />
     <Rule Id="CA2210" Action="None" />
     <Rule Id="CA2237" Action="None" />
+    <Rule Id="CA2243" Action="None" />
   </Rules>
   <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp.Features" RuleNamespace="Microsoft.CodeAnalysis.CSharp.Features">
     <Rule Id="IDE0001" Action="None" />

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.html</licenseUrl>
+    <projectUrl>https://github.com/rainlabs-eu/NSrtm</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>https://github.com/rainlabs-eu/NSrtm/releases/tag/v$version$</releaseNotes>
+    <copyright>Copyright 2015 Krzysztof Wesołowski</copyright>
+    <tags>SRTM Elevation HGT</tags>
+    <language>en-US</language>
+  </metadata>
+</package>
