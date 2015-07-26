@@ -19,6 +19,7 @@ namespace NSrtm.Demo
                                                      {
                                                          HgtElevationProvider.CreateInMemoryFromZipFiles("D:\\SRTM3ZIP"),
                                                          HgtElevationProvider.CreateInMemoryFromRawFiles("D:\\SRTM3HGT"),
+                                                         HgtElevationProvider.CreateMemoryMappedFromRawFiles("D:\\SRTM3HGT"),
                                                      });
         }
     }

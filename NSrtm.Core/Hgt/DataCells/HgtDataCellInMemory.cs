@@ -15,7 +15,7 @@ namespace NSrtm.Core
             _hgtData = hgtData;
         }
 
-        protected override double elevationAtOffset(int bytesPos)
+        protected override double ElevationAtOffset(int bytesPos)
         {
             // Motorola "big endian" order with the most significant byte first
             Int16 elevation = (short)((_hgtData[bytesPos]) << 8 | _hgtData[bytesPos + 1]);

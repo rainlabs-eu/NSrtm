@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hgt\DataCells\HgtDataCellInMemoryMappedFactory.cs" />
     <Compile Include="Hgt\Utils\HgtCellCoords.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellBase.cs" />
     <Compile Include="Hgt\Loaders\HgtDataLoaderFromRaw.cs" />

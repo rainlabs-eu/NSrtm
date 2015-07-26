@@ -7,7 +7,7 @@ namespace NSrtm.Core
     {
         private readonly IHgtDataCellFactory _cellFactory;
 
-        public HgtElevationProvider(IHgtDataCellFactory cellFactory)
+        public HgtElevationProvider([NotNull] IHgtDataCellFactory cellFactory)
         {
             if (cellFactory == null) throw new ArgumentNullException("cellFactory");
             _cellFactory = cellFactory;

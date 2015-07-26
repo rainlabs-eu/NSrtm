@@ -5,6 +5,6 @@ namespace NSrtm.Core
     public interface IHgtDataCellFactory
     {
         [NotNull]
-        IHgtDataCell GetCellFor(HgtCellCoords latitude);
+        IHgtDataCell GetCellFor(HgtCellCoords coords);
     }
 }

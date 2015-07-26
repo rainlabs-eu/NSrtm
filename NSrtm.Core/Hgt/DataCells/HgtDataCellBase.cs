@@ -2,7 +2,7 @@ using System;
 
 namespace NSrtm.Core
 {
-    internal abstract class HgtDataCellBase : IHgtDataCell
+    public abstract class HgtDataCellBase : IHgtDataCell
     {
         private readonly int _pointsPerCell;
         private readonly HgtCellCoords _coords;
@@ -22,9 +22,9 @@ namespace NSrtm.Core
             if (bytesPos < 0 || bytesPos > _pointsPerCell * _pointsPerCell * 2)
                 throw new ArgumentException("latitude or longitude out of range");
 
-            return elevationAtOffset(bytesPos);
+            return ElevationAtOffset(bytesPos);
         }
 
-        protected abstract double elevationAtOffset(int bytesPos);
+        protected abstract double ElevationAtOffset(int bytesPos);
     }
 }
