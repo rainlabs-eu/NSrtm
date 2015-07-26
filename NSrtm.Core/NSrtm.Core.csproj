@@ -83,7 +83,9 @@
     <Compile Include="Hgt\HgtElevationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="NSrtm.Core.nuspec" />
     <None Include="NSrtm.Core.ruleset" />
+    <None Include="nuget-pack.ps1" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
