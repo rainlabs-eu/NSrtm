@@ -1,6 +1,6 @@
 namespace NSrtm.Core
 {
-    public interface IHgtDataCell
+    internal interface IHgtDataCell
     {
         double GetElevation(double latitude, double longitude);
 

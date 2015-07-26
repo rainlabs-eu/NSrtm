@@ -2,17 +2,17 @@
 <package >
   <metadata>
     <id>NSrtm</id>
-    <version>0.1.3-alpha</version>
+    <version>0.2.0-beta</version>
     <title>SRTM for .NET</title>
-    <authors>Rainlabs S.C.</authors>
-    <owners></owners>
+    <authors>Krzysztof Wesołowski (krzysztof.wesolowski@rainlabs.pl)</authors>
+    <owners>Rainlabs S.C.</owners>
     <description>
-      Library to access SRTM data form .NET
+      Library to access SRTM data from .NET
     </description>
     <releaseNotes>
     </releaseNotes>
     <language>en-US</language>
-    <copyright>Copyright 2015</copyright>
+    <copyright>Copyright 2015 Rainlabs S.C.</copyright>
     <dependencies></dependencies>
     <references></references>
     <tags></tags>
