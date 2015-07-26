@@ -1,20 +1,22 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
-    class HgtDataLoaderFromZip : IHgtDataLoader
+    internal class HgtDataLoaderFromZip : IHgtDataLoader
     {
 
         private readonly IHgtPathResolver _pathResolver;
 
-        public HgtDataLoaderFromZip(IHgtPathResolver pathResolver)
+        public HgtDataLoaderFromZip([NotNull] IHgtPathResolver pathResolver)
         {
             _pathResolver = pathResolver;
         }
 
-        public byte[] LoadFromFile(string directory, HgtCellCoords coords)
+        [NotNull]
+        public byte[] LoadFromFile([NotNull] string directory, HgtCellCoords coords)
         {
             var filePath = _pathResolver.FindFilePath(directory, coords);
 

@@ -1,14 +1,16 @@
 using System;
+using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
-    public class HgtFileException : Exception
+    internal class HgtFileException : Exception
     {
         private readonly HgtCellCoords _coords;
 
-        public HgtFileException(HgtCellCoords coords, string message)
+        protected HgtFileException(HgtCellCoords coords, [NotNull] string message)
             : base(message)
         {
+            _coords = coords;
         }
 
         public HgtFileException(HgtCellCoords coords, string message, Exception innerException)

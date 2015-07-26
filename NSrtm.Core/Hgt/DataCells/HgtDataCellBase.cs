@@ -2,7 +2,7 @@ using System;
 
 namespace NSrtm.Core
 {
-    public abstract class HgtDataCellBase : IHgtDataCell
+    internal abstract class HgtDataCellBase : IHgtDataCell
     {
         private readonly int _pointsPerCell;
         private readonly HgtCellCoords _coords;
@@ -24,6 +24,8 @@ namespace NSrtm.Core
 
             return ElevationAtOffset(bytesPos);
         }
+
+        public abstract long MemorySize { get; }
 
         protected abstract double ElevationAtOffset(int bytesPos);
     }

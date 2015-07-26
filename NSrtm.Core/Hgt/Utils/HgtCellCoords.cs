@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
-    public struct HgtCellCoords : IEquatable<HgtCellCoords>
+    internal struct HgtCellCoords : IEquatable<HgtCellCoords>
     {
         private readonly int _lat;
         private readonly int _lon;

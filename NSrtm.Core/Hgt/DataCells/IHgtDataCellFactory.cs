@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
-    public interface IHgtDataCellFactory
+    internal interface IHgtDataCellFactory
     {
         [NotNull]
         IHgtDataCell GetCellFor(HgtCellCoords coords);

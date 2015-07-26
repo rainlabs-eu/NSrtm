@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
@@ -10,11 +11,13 @@ namespace NSrtm.Core
         {
         }
 
-        public static HgtDataCellInvalid Invalid { get { return invalid; } }
+        [NotNull] public static HgtDataCellInvalid Invalid { get { return invalid; } }
 
         public double GetElevation(double latitude, double longitude)
         {
             return Double.NaN;
         }
+
+        public long MemorySize { get { return 0; } }
     }
 }

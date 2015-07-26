@@ -1,5 +1,5 @@
-using System;
 using System.IO;
+using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
@@ -7,7 +7,7 @@ namespace NSrtm.Core
     {
         private readonly IHgtPathResolver _pathResolver;
 
-        public HgtDataLoaderFromRaw(IHgtPathResolver pathResolver)
+        public HgtDataLoaderFromRaw([NotNull] IHgtPathResolver pathResolver)
         {
             _pathResolver = pathResolver;
         }

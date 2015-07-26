@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
@@ -6,23 +7,39 @@ namespace NSrtm.Core
     public class HgtElevationProvider : IElevationProvider
     {
         private readonly IHgtDataCellFactory _cellFactory;
+        private readonly ConcurrentDictionary<HgtCellCoords, IHgtDataCell> _cache = new ConcurrentDictionary<HgtCellCoords, IHgtDataCell>();
 
-        public HgtElevationProvider([NotNull] IHgtDataCellFactory cellFactory)
+        internal HgtElevationProvider([NotNull] IHgtDataCellFactory cellFactory)
         {
             if (cellFactory == null) throw new ArgumentNullException("cellFactory");
             _cellFactory = cellFactory;
+            Name = "Unknown";
+            Description = "Unknown";
         }
 
-        public string Name { get; set; }
-        public string Description { get; set; }
+        [NotNull] public string Name { get; set; }
+        [NotNull] public string Description { get; set; }
 
         public double GetElevation(double latitude, double longitude)
         {
-            HgtCellCoords coords = HgtCellCoords.ForLatLon(latitude, longitude);
+            var coords = HgtCellCoords.ForLatLon(latitude, longitude);
 
-            var cell = _cellFactory.GetCellFor(coords);
+            var cell = _cache.GetOrAdd(coords, buildCellFor);
 
             return cell.GetElevation(latitude, longitude);
+        }
+
+        [NotNull]
+        private IHgtDataCell buildCellFor(HgtCellCoords coords)
+        {
+            try
+            {
+                return _cellFactory.GetCellFor(coords);
+            }
+            catch (HgtFileException)
+            {
+                return HgtDataCellInvalid.Invalid;
+            }
         }
 
         [NotNull]
@@ -54,7 +71,7 @@ namespace NSrtm.Core
         {
             IHgtPathResolver pathResolver = new HgtPathResolverRaw();
 
-            return new HgtElevationProvider(new HgtDataCellInMemoryMappedFactory(directory, pathResolver))
+            return new HgtElevationProvider(new HgtDataCellInFileFactory(directory, pathResolver))
                    {
                        Name = "SRTM files",
                        Description = string.Format("Memory mapped SRTM files (HGT) from directory {0}", directory)

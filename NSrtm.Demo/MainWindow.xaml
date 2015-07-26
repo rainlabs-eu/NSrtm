@@ -24,10 +24,7 @@
                         <Setter Property="ContentStringFormat" Value="{}{0:F3} °" />
                     </Style>
 
-                    <Style TargetType="Label" BasedOn="{StaticResource Lookup}" x:Key="HeightLookup">
-                        <Setter Property="ContentStringFormat" Value="{}{0:F0} m" />
-                    </Style>
-
+                    <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
                     <Style TargetType="Slider" BasedOn="{StaticResource MetroSlider}">
                         <Setter Property="AutoToolTipPlacement" Value="BottomRight" />
                         <Setter Property="AutoToolTipPrecision" Value="3" />

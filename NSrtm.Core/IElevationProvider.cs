@@ -1,12 +1,14 @@
+using JetBrains.Annotations;
+
 namespace NSrtm.Core
 {
     public interface IElevationProvider
     {
-        string Name { get; }
-        string Description { get; }
+        [NotNull] string Name { get; }
+        [NotNull] string Description { get; }
 
         /// <summary>
-        /// Gets elevation above MSL
+        ///     Gets elevation above MSL
         /// </summary>
         /// <param name="latitude">Latitude in degrees</param>
         /// <param name="longitude">Longitude in degrees</param>
@@ -14,4 +16,3 @@ namespace NSrtm.Core
         double GetElevation(double latitude, double longitude);
     }
 }
-

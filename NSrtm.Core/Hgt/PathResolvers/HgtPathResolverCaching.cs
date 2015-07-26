@@ -15,7 +15,7 @@ namespace NSrtm.Core
         }
 
         [NotNull]
-        private string findPathForFile(string directory, HgtCellCoords coords)
+        private string findPathForFile([NotNull] string directory, HgtCellCoords coords)
         {
             string filename = coordsToFilename(coords);
             string[] potentialPaths =
@@ -37,6 +37,7 @@ namespace NSrtm.Core
             else throw new HgtFileNotFoundException(coords);
         }
 
+        [NotNull]
         protected abstract string coordsToFilename(HgtCellCoords coords);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using JetBrains.Annotations;
 using ReactiveUI;
@@ -44,10 +43,10 @@ namespace NSrtm.Demo
 
             yield return UserError.RegisterHandler(ue => Observable.Return(ue)
                                                                    .ObserveOn(RxApp.MainThreadScheduler)
-                                                                   .Select(AskForUserInput));
+                                                                   .Select(askForUserInput));
         }
 
-        private RecoveryOptionResult AskForUserInput(UserError ue)
+        private RecoveryOptionResult askForUserInput(UserError ue)
         {
             if (ue.InnerException != null) MessageBox.Show(ue.InnerException.Message, ue.ErrorMessage);
             else
@@ -63,9 +62,9 @@ namespace NSrtm.Demo
                                                                                                   typeof(DemoViewModel),
                                                                                                   typeof(MainWindow));
 
-        public DemoViewModel ViewModel { get { return (DemoViewModel)GetValue(ViewModelProperty); } set { SetValue(ViewModelProperty, value); } }
+        [CanBeNull] public DemoViewModel ViewModel { get { return (DemoViewModel)GetValue(ViewModelProperty); } set { SetValue(ViewModelProperty, value); } }
 
-        object IViewFor.ViewModel { get { return ViewModel; } set { ViewModel = (DemoViewModel)value; } }
+        [CanBeNull] object IViewFor.ViewModel { get { return ViewModel; } set { ViewModel = (DemoViewModel)value; } }
 
         #endregion
     }

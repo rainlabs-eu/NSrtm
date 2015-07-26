@@ -34,10 +34,10 @@ namespace NSrtm.Demo
         private float _maxVisualizedHeight = 2500;
         private readonly ObservableAsPropertyHelper<double> _progress;
         public double Progress { get { return _progress.Value; } }
-        private Subject<double> progresSubject = new Subject<double>();
+        private readonly Subject<double> _progresSubject = new Subject<double>();
         
 
-        public DemoViewModel(IEnumerable<IElevationProvider> providers = null)
+        public DemoViewModel([CanBeNull] IEnumerable<IElevationProvider> providers = null)
         {
             _availableElevationProviders = providers ?? Locator.Current.GetService<IEnumerable<IElevationProvider>>();
             if (_availableElevationProviders == null) throw new ArgumentNullException("providers");
@@ -52,7 +52,7 @@ namespace NSrtm.Demo
             _retrieveElevationsCommand.ThrownExceptions.Subscribe(e => UserError.Throw("Error during retrieval of elevation data", e));
             _selectedElevationProvider = _availableElevationProviders.FirstOrDefault();
 
-            _progress = progresSubject.ToProperty(this, t => t.Progress, scheduler: RxApp.MainThreadScheduler);
+            _progress = _progresSubject.ToProperty(this, t => t.Progress, scheduler: RxApp.MainThreadScheduler);
         }
 
         public float MinVisualizedHeight
@@ -100,10 +100,10 @@ namespace NSrtm.Demo
             set { this.RaiseAndSetIfChanged(ref _elevationValueStats, value); }
         }
 
-        public ReactiveCommand<ElevationValueStats> RetrieveElevationsCommand { get { return _retrieveElevationsCommand; } }
+        [NotNull] public ReactiveCommand<ElevationValueStats> RetrieveElevationsCommand { get { return _retrieveElevationsCommand; } }
         // ReSharper disable once StringLiteralTypo
         [DllImport("shlwapi.dll")]
-        public static extern int ColorHLSToRGB(int H, int L, int S);
+        public static extern int ColorHLSToRGB(int h, int l, int s);
 
         [NotNull]
         private async Task<ElevationValueStats> refreshElevationsAsync()
@@ -172,13 +172,14 @@ namespace NSrtm.Demo
             _writeableBitmap.Unlock();
         }
 
-        private static Task<ElevationValueStats> elevationStatsAsync(IEnumerable<float> allElevations, TimeSpan time)
+        [NotNull]
+        private static Task<ElevationValueStats> elevationStatsAsync([NotNull] IEnumerable<float> allElevations, TimeSpan time)
         {
             return Task.Run(() => elevationStatsAsyncImpl(allElevations, time));
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static ElevationValueStats elevationStatsAsyncImpl(IEnumerable<float> allElevationsLinear, TimeSpan time)
+        private static ElevationValueStats elevationStatsAsyncImpl([NotNull] IEnumerable<float> allElevationsLinear, TimeSpan time)
         {
             var allElevations = allElevationsLinear.Where(v => !float.IsNaN(v));
 
@@ -237,14 +238,14 @@ namespace NSrtm.Demo
             {
                 double lat = minLat + rIdx * latRange / pixelHeightInt;
                 result[rIdx] = retrieveRowElevation(ep, lat, minLon, lonRange);
-                progresSubject.OnNext(rIdx*1.0 / pixelHeightInt);
+                _progresSubject.OnNext(rIdx*1.0 / pixelHeightInt);
             }
 
             return result;
         }
 
         [NotNull]
-        private static float[] retrieveRowElevation(IElevationProvider ep, double lat, double minLon, double lonRange)
+        private static float[] retrieveRowElevation([NotNull] IElevationProvider ep, double lat, double minLon, double lonRange)
         {
             if (ep == null) throw new ArgumentNullException("ep");
 

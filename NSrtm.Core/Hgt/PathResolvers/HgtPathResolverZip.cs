@@ -5,7 +5,6 @@ namespace NSrtm.Core
         protected override string coordsToFilename(HgtCellCoords coords)
         {
             return coords.ToBaseName() + ".hgt.zip";
-            
         }
     }
 }
