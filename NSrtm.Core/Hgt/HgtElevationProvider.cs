@@ -4,6 +4,10 @@ using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
+    /// <summary>
+    /// Provides elevation from SRTM3 and SRTM1 format files (HGT or HGT.ZIP) downloaded from:
+    /// http://dds.cr.usgs.gov/srtm/version2_1/
+    /// </summary>
     public class HgtElevationProvider : IElevationProvider
     {
         private readonly IHgtDataCellFactory _cellFactory;
@@ -17,9 +21,22 @@ namespace NSrtm.Core
             Description = "Unknown";
         }
 
+        /// <summary>
+        ///     Short name describing implementation. Used for UI/Demos where different implementations are available.
+        /// </summary>
         [NotNull] public string Name { get; set; }
+
+        /// <summary>
+        ///     More descriptive info about implementation. Used for UI/Demos where different implementations are available.
+        /// </summary>
         [NotNull] public string Description { get; set; }
 
+        /// <summary>
+        ///     Gets elevation above MSL
+        /// </summary>
+        /// <param name="latitude">Latitude in degrees in WGS84 datum</param>
+        /// <param name="longitude">Longitude in degrees in WGS84 datum</param>
+        /// <returns></returns>
         public double GetElevation(double latitude, double longitude)
         {
             var coords = HgtCellCoords.ForLatLon(latitude, longitude);
@@ -42,6 +59,12 @@ namespace NSrtm.Core
             }
         }
 
+        /// <summary>
+        /// Creates elevation provider which loads HGT files to memory on demand.
+        /// </summary>
+        /// <remarks>Files are loaded and cached forever, so for "whole world coverage" it can use up to 16GB of RAM.</remarks>
+        /// <param name="directory"></param>
+        /// <returns>Created provider.</returns>
         [NotNull]
         public static IElevationProvider CreateInMemoryFromRawFiles([NotNull] string directory)
         {
@@ -54,6 +77,12 @@ namespace NSrtm.Core
                    };
         }
 
+        /// <summary>
+        /// Creates elevation provider which loads HGT.ZIP files to memory on demand.
+        /// </summary>
+        /// <remarks>Files are loaded and cached forever, so for "whole world coverage" it can use up to 16GB of RAM.</remarks>
+        /// <param name="directory"></param>
+        /// <returns>Created provider.</returns>
         [NotNull]
         public static IElevationProvider CreateInMemoryFromZipFiles([NotNull] string directory)
         {
@@ -66,6 +95,12 @@ namespace NSrtm.Core
                    };
         }
 
+        /// <summary>
+        /// Creates elevation provider which reads HGT files from disk.
+        /// </summary>
+        /// <remarks>It is 1000 - 10000 times slower than in memory implementations, but it uses almost no RAM.</remarks>
+        /// <param name="directory"></param>
+        /// <returns>Created provider.</returns>
         [NotNull]
         public static IElevationProvider CreateMemoryMappedFromRawFiles([NotNull] string directory)
         {

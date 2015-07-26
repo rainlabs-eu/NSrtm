@@ -252,6 +252,8 @@ function Publish {
 Write-Log " "
 Write-Log "NuGet Packager 2.0.3" -ForegroundColor Yellow
 
+Invoke-WebRequest http://nuget.org/nuget.exe -OutFile NuGet.exe
+
 # Make sure the nuget executable is writable
 Set-ItemProperty NuGet.exe -Name IsReadOnly -Value $false
 

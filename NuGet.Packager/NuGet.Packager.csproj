@@ -53,7 +53,6 @@
   <ItemGroup>
     <None Include="NuGetPackage.ps1" />
     <None Include="NuGetSetup.ps1" />
-    <None Include="NuGet.exe" />
     <None Include="NuGet.config" />
     <None Include="Package.nuspec" />
   </ItemGroup>
@@ -64,10 +63,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\NSrtm.Core\bin\Release\NSrtm.Core.dll">
-      <Link>lib\NSrtm.Core.dll</Link>
+      <Link>lib\net45\NSrtm.Core.dll</Link>
     </Content>
     <Content Include="..\NSrtm.Core\bin\Release\NSrtm.Core.pdb">
-      <Link>lib\NSrtm.Core.pdb</Link>
+      <Link>lib\net45\NSrtm.Core.pdb</Link>
+    </Content>
+    <Content Include="..\NSrtm.Core\bin\Release\NSrtm.Core.xml">
+      <Link>lib\net45\NSrtm.Core.xml</Link>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
