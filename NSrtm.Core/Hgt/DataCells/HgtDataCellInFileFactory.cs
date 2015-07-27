@@ -7,19 +7,17 @@ namespace NSrtm.Core
 {
     internal class HgtDataCellInFileFactory : IHgtDataCellFactory
     {
-        private readonly string _directory;
         private readonly IHgtPathResolver _pathResolver;
 
-        public HgtDataCellInFileFactory([NotNull] string directory, [NotNull] IHgtPathResolver pathResolver)
+        public HgtDataCellInFileFactory([NotNull] IHgtPathResolver pathResolver)
         {
-            _directory = directory;
             _pathResolver = pathResolver;
         }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",Justification = "Returned cell is disposable")]
         public IHgtDataCell GetCellFor(HgtCellCoords coords)
         {
-            var path = _pathResolver.FindFilePath(_directory, coords);
+            var path = _pathResolver.FindFilePath(coords);
 
             FileStream file = null;
             try

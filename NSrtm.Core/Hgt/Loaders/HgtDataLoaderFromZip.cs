@@ -16,9 +16,9 @@ namespace NSrtm.Core
         }
 
         [NotNull]
-        public byte[] LoadFromFile([NotNull] string directory, HgtCellCoords coords)
+        public byte[] LoadFromFile(HgtCellCoords coords)
         {
-            var filePath = _pathResolver.FindFilePath(directory, coords);
+            var filePath = _pathResolver.FindFilePath(coords);
 
             byte[] hgtData;
             using (var zipArchive = ZipFile.OpenRead(filePath))

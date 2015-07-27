@@ -5,6 +5,6 @@ namespace NSrtm.Core
     internal interface IHgtPathResolver
     {
         [NotNull]
-        string FindFilePath([NotNull] string directory, HgtCellCoords coords);
+        string FindFilePath(HgtCellCoords coords);
     }
 }

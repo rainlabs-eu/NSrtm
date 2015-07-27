@@ -12,9 +12,9 @@ namespace NSrtm.Core
             _pathResolver = pathResolver;
         }
 
-        public byte[] LoadFromFile(string directory, HgtCellCoords coords)
+        public byte[] LoadFromFile(HgtCellCoords coords)
         {
-            var filePath = _pathResolver.FindFilePath(directory, coords);
+            var filePath = _pathResolver.FindFilePath(coords);
 
             var hgtData = File.ReadAllBytes(filePath);
             int length = hgtData.Length;
