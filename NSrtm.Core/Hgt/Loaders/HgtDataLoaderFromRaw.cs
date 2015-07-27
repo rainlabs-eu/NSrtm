@@ -16,10 +16,9 @@ namespace NSrtm.Core
         {
             var filePath = _pathResolver.FindFilePath(directory, coords);
 
-
             var hgtData = File.ReadAllBytes(filePath);
             int length = hgtData.Length;
-            if (length != HgtUtils.Srtm3Length && length != HgtUtils.Srtm1Length)
+            if (!HgtUtils.IsDataLengthValid(length))
                 throw new HgtFileInvalidException(coords, string.Format("Invalid length - {0} bytes", length));
 
             return hgtData;

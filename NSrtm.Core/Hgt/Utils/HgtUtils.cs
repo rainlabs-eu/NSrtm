@@ -4,8 +4,10 @@ namespace NSrtm.Core
 {
     static internal class HgtUtils
     {
-        public const int Srtm3Length = 1201 * 1201 * 2;
-        public const int Srtm1Length = 3601 * 3601 * 2;
+        private const int srtm1PointsPerCell = 3601;
+        private const int srtm3PointsPerCell = 1201;
+        private const int srtm3Length = srtm3PointsPerCell * srtm3PointsPerCell * 2;
+        private const int srtm1Length = srtm1PointsPerCell * srtm1PointsPerCell * 2;
 
 
         internal static int PointsPerCellFromDataLength(int length)
@@ -13,16 +15,26 @@ namespace NSrtm.Core
             int pointsPerCell;
             switch (length)
             {
-                case Srtm3Length: // SRTM-3
-                    pointsPerCell = 1201;
+                case srtm3Length: // SRTM-3
+                    pointsPerCell = srtm3PointsPerCell;
                     break;
-                case Srtm1Length: // SRTM-1
-                    pointsPerCell = 3601;
+                case srtm1Length: // SRTM-1
+                    pointsPerCell = srtm1PointsPerCell;
                     break;
                 default:
                     throw new ArgumentException(String.Format("Unsupported data length {0}", length), "length");
             }
             return pointsPerCell;
+        }
+
+        internal static bool IsDataLengthValid(long length)
+        {
+            return length == srtm3Length || length == srtm1Length;
+        }
+
+        public static bool IsDataLengthValid(int length)
+        {
+            return IsDataLengthValid((long)length);
         }
     }
 }

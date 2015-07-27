@@ -26,7 +26,7 @@ namespace NSrtm.Core
                 var entry = zipArchive.Entries.Single();
 
                 long length = entry.Length;
-                if (length != HgtUtils.Srtm3Length && length != HgtUtils.Srtm1Length)
+                if (!HgtUtils.IsDataLengthValid(length))
                     throw new HgtFileInvalidException(coords, string.Format("Invalid length - {0} bytes", length));
 
                 using (var zipStream = entry.Open())
