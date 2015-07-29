@@ -26,6 +26,12 @@ namespace NSrtm.Core
         /// <returns></returns>
         double GetElevation(double latitude, double longitude);
 
+        /// <summary>
+        ///     Gets elevation above MSL
+        /// </summary>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <returns></returns>
         Task<double> GetElevationAsync(double latitude, double longitude);
     }
 }

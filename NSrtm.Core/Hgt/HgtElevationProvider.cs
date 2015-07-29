@@ -6,8 +6,8 @@ using JetBrains.Annotations;
 namespace NSrtm.Core
 {
     /// <summary>
-    /// Provides elevation from SRTM3 and SRTM1 format files (HGT or HGT.ZIP) downloaded from:
-    /// http://dds.cr.usgs.gov/srtm/version2_1/
+    ///     Provides elevation from SRTM3 and SRTM1 format files (HGT or HGT.ZIP) downloaded from:
+    ///     http://dds.cr.usgs.gov/srtm/version2_1/
     /// </summary>
     public class HgtElevationProvider : IElevationProvider
     {
@@ -47,6 +47,12 @@ namespace NSrtm.Core
             return cell.GetElevation(latitude, longitude);
         }
 
+        /// <summary>
+        ///     Gets elevation above MSL
+        /// </summary>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <returns></returns>
         public Task<double> GetElevationAsync(double latitude, double longitude)
         {
             var coords = HgtCellCoords.ForLatLon(latitude, longitude);
@@ -90,7 +96,7 @@ namespace NSrtm.Core
         }
 
         /// <summary>
-        /// Creates elevation provider which loads HGT files to memory on demand.
+        ///     Creates elevation provider which loads HGT files to memory on demand.
         /// </summary>
         /// <remarks>Files are loaded and cached forever, so for "whole world coverage" it can use up to 16GB of RAM.</remarks>
         /// <param name="directory"></param>
@@ -108,7 +114,7 @@ namespace NSrtm.Core
         }
 
         /// <summary>
-        /// Creates elevation provider which loads HGT.ZIP files to memory on demand.
+        ///     Creates elevation provider which loads HGT.ZIP files to memory on demand.
         /// </summary>
         /// <remarks>Files are loaded and cached forever, so for "whole world coverage" it can use up to 16GB of RAM.</remarks>
         /// <param name="directory"></param>
@@ -126,7 +132,7 @@ namespace NSrtm.Core
         }
 
         /// <summary>
-        /// Creates elevation provider which reads HGT files from disk.
+        ///     Creates elevation provider which reads HGT files from disk.
         /// </summary>
         /// <remarks>It is 1000 - 10000 times slower than in memory implementations, but it uses almost no RAM.</remarks>
         /// <param name="directory"></param>
