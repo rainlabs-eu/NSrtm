@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
@@ -24,7 +25,7 @@ namespace NSrtm.Core
             {
                 int fileSize = (int)new FileInfo(path).Length;
                 file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-                return new HgtDataMemoryInFileCell(file, HgtUtils.PointsPerCellFromDataLength(fileSize), coords);
+                return new HgtDataCellInFile(file, HgtUtils.PointsPerCellFromDataLength(fileSize), coords);
             }
             catch (Exception)
             {
@@ -33,12 +34,17 @@ namespace NSrtm.Core
             }
         }
 
-        public sealed class HgtDataMemoryInFileCell : HgtDataCellBase, IDisposable
+        public Task<IHgtDataCell> GetCellForAsync(HgtCellCoords coords)
+        {
+            return Task.FromResult(GetCellFor(coords));
+        }
+
+        public sealed class HgtDataCellInFile : HgtDataCellBase, IDisposable
         {
             private readonly FileStream _file;
             private readonly object _lock = new object();
 
-            internal HgtDataMemoryInFileCell([NotNull] FileStream file, int fileSize, HgtCellCoords coords) : base(fileSize, coords)
+            internal HgtDataCellInFile([NotNull] FileStream file, int fileSize, HgtCellCoords coords) : base(fileSize, coords)
             {
                 _file = file;
             }
@@ -48,6 +54,11 @@ namespace NSrtm.Core
             public void Dispose()
             {
                 _file.Dispose();
+            }
+
+            public override Task<double> GetElevationAsync(double latitude, double longitude)
+            {
+                return Task.FromResult(GetElevation(latitude, longitude));
             }
 
             protected override double ElevationAtOffset(int bytesPos)

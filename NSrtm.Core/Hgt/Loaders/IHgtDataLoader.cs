@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
@@ -6,5 +7,7 @@ namespace NSrtm.Core
     {
         [NotNull]
         byte[] LoadFromFile(HgtCellCoords coords);
+
+        Task<byte[]> LoadFromFileAsync(HgtCellCoords coords);
     }
 }

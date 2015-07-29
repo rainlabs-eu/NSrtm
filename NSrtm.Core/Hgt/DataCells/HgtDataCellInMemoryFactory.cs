@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
@@ -19,6 +20,13 @@ namespace NSrtm.Core
             return new HgtDataCellInMemory(data, HgtUtils.PointsPerCellFromDataLength(data.Length), coords);
         }
 
+        public async Task<IHgtDataCell> GetCellForAsync(HgtCellCoords coords)
+        {
+            var data = await _loader.LoadFromFileAsync(coords);
+
+            return new HgtDataCellInMemory(data, HgtUtils.PointsPerCellFromDataLength(data.Length), coords);
+        }
+
         private class HgtDataCellInMemory : HgtDataCellBase
         {
             private readonly byte[] _hgtData;
@@ -29,6 +37,12 @@ namespace NSrtm.Core
             }
 
             public override long MemorySize { get { return _hgtData.Length; } }
+
+            [NotNull]
+            public override Task<double> GetElevationAsync(double latitude, double longitude)
+            {
+                return Task.FromResult(GetElevation(latitude, longitude));
+            }
 
             protected override double ElevationAtOffset(int bytesPos)
             {

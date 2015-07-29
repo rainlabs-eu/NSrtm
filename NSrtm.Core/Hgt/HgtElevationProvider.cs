@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
@@ -44,6 +45,35 @@ namespace NSrtm.Core
             var cell = _cache.GetOrAdd(coords, buildCellFor);
 
             return cell.GetElevation(latitude, longitude);
+        }
+
+        public Task<double> GetElevationAsync(double latitude, double longitude)
+        {
+            var coords = HgtCellCoords.ForLatLon(latitude, longitude);
+            IHgtDataCell cellFromCache;
+            if (_cache.TryGetValue(coords, out cellFromCache))
+            {
+                cellFromCache.GetElevationAsync(latitude, longitude);
+            }
+
+            return buildAndCacheCellAndReturnElevationAsync(coords, latitude, longitude);
+        }
+
+        private async Task<double> buildAndCacheCellAndReturnElevationAsync(HgtCellCoords coords, double latitude, double longitude)
+        {
+            IHgtDataCell ret;
+            try
+            {
+                ret = await _cellFactory.GetCellForAsync(coords);
+            }
+            catch (HgtFileException)
+            {
+                ret = HgtDataCellInvalid.Invalid;
+            }
+
+            var cell = _cache.GetOrAdd(coords, ret);
+
+            return await cell.GetElevationAsync(latitude, longitude);
         }
 
         [NotNull]

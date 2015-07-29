@@ -1,27 +1,30 @@
 using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
-    internal class HgtDataLoaderFromRaw : IHgtDataLoader
+    internal sealed class HgtDataLoaderFromRaw : HgtDataLoaderFromFileStreamBase
     {
-        private readonly IHgtPathResolver _pathResolver;
 
-        public HgtDataLoaderFromRaw([NotNull] IHgtPathResolver pathResolver)
+        public HgtDataLoaderFromRaw([NotNull] IHgtPathResolver pathResolver) : base(pathResolver)
         {
-            _pathResolver = pathResolver;
         }
 
-        public byte[] LoadFromFile(HgtCellCoords coords)
+        protected override byte[] LoadHgtDataFromFile(HgtCellCoords coords, string filePath)
         {
-            var filePath = _pathResolver.FindFilePath(coords);
+            using (var fileStream = File.Open(filePath,FileMode.Open,FileAccess.Read,FileShare.Read))
+            {
+                return LoadHgtDataFromStream(fileStream);
+            }
+        }
 
-            var hgtData = File.ReadAllBytes(filePath);
-            int length = hgtData.Length;
-            if (!HgtUtils.IsDataLengthValid(length))
-                throw new HgtFileInvalidException(coords, string.Format("Invalid length - {0} bytes", length));
-
-            return hgtData;
+        protected override async Task<byte[]> LoadHgtDataFromFileAsync(HgtCellCoords coords, string filePath)
+        {
+            using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                return await LoadHgtDataFromStreamAsync(fileStream);
+            }
         }
     }
 }

@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace NSrtm.Core
 {
     internal interface IHgtDataCell
@@ -5,5 +7,6 @@ namespace NSrtm.Core
         double GetElevation(double latitude, double longitude);
 
         long MemorySize { get; }
+        Task<double> GetElevationAsync(double latitude, double longitude);
     }
 }

@@ -1,26 +1,19 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
-    internal class HgtDataLoaderFromZip : IHgtDataLoader
+    internal sealed class HgtDataLoaderFromZip : HgtDataLoaderFromFileStreamBase
     {
-
-        private readonly IHgtPathResolver _pathResolver;
-
-        public HgtDataLoaderFromZip([NotNull] IHgtPathResolver pathResolver)
+        public HgtDataLoaderFromZip([NotNull] IHgtPathResolver pathResolver) : base(pathResolver)
         {
-            _pathResolver = pathResolver;
         }
 
-        [NotNull]
-        public byte[] LoadFromFile(HgtCellCoords coords)
+        protected override byte[] LoadHgtDataFromFile(HgtCellCoords coords, string filePath)
         {
-            var filePath = _pathResolver.FindFilePath(coords);
-
-            byte[] hgtData;
             using (var zipArchive = ZipFile.OpenRead(filePath))
             {
                 var entry = zipArchive.Entries.Single();
@@ -31,14 +24,26 @@ namespace NSrtm.Core
 
                 using (var zipStream = entry.Open())
                 {
-                    using (var memory = new MemoryStream())
-                    {
-                        zipStream.CopyTo(memory);
-                        hgtData = memory.ToArray();
-                    }
+                    return LoadHgtDataFromStream(zipStream);
                 }
             }
-            return hgtData;
+        }
+
+        protected override async Task<byte[]> LoadHgtDataFromFileAsync(HgtCellCoords coords, string filePath)
+        {
+            using (var zipArchive = ZipFile.OpenRead(filePath))
+            {
+                var entry = zipArchive.Entries.Single();
+
+                long length = entry.Length;
+                if (!HgtUtils.IsDataLengthValid(length))
+                    throw new HgtFileInvalidException(coords, string.Format("Invalid length - {0} bytes", length));
+
+                using (var zipStream = entry.Open())
+                {
+                    return await LoadHgtDataFromStreamAsync(zipStream);
+                }
+            }
         }
     }
 }

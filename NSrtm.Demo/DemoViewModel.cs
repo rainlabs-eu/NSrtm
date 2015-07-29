@@ -24,6 +24,8 @@ namespace NSrtm.Demo
         private const int pixelCount = pixelWidthInt * pixelHeightInt;
         private readonly WriteableBitmap _writeableBitmap;
         private readonly ReactiveCommand<ElevationValueStats> _retrieveElevationsCommand;
+        private readonly ObservableAsPropertyHelper<double> _progress;
+        private readonly Subject<double> _progresSubject = new Subject<double>();
         private IEnumerable<IElevationProvider> _availableElevationProviders;
         [CanBeNull] private IElevationProvider _selectedElevationProvider;
         private double _centerLatitude = 50;
@@ -32,10 +34,7 @@ namespace NSrtm.Demo
         private ElevationValueStats _elevationValueStats;
         private float _minVisualizedHeight = -100;
         private float _maxVisualizedHeight = 2500;
-        private readonly ObservableAsPropertyHelper<double> _progress;
-        public double Progress { get { return _progress.Value; } }
-        private readonly Subject<double> _progresSubject = new Subject<double>();
-        
+        private bool _useAsyncApi;
 
         public DemoViewModel([CanBeNull] IEnumerable<IElevationProvider> providers = null)
         {
@@ -54,6 +53,9 @@ namespace NSrtm.Demo
 
             _progress = _progresSubject.ToProperty(this, t => t.Progress, scheduler: RxApp.MainThreadScheduler);
         }
+
+        public double Progress { get { return _progress.Value; } }
+        public bool UseAsyncApi { get { return _useAsyncApi; } set { this.RaiseAndSetIfChanged(ref _useAsyncApi, value); } }
 
         public float MinVisualizedHeight
         {
@@ -211,16 +213,6 @@ namespace NSrtm.Demo
         {
             if (ep == null) throw new ArgumentNullException("ep");
 
-            return Task.Run(() => retrieveElevationAsyncImpl(ep, latCenter, lonCenter, range));
-        }
-
-        [NotNull]
-        private float[][] retrieveElevationAsyncImpl(
-            [NotNull] IElevationProvider ep,
-            double latCenter,
-            double lonCenter,
-            double range)
-        {
             if (ep == null) throw new ArgumentNullException("ep");
 
             double minLat = Math.Max(latCenter - range, -90);
@@ -232,13 +224,39 @@ namespace NSrtm.Demo
             double latRange = maxLat - minLat;
             double lonRange = maxLon - minLon;
 
+            if (_useAsyncApi)
+            {
+                return retrieveElevationAsyncImpl(ep, minLat, latRange, minLon, lonRange);
+            }
+            else
+            {
+                return Task.Run(() => retrieveElevationImpl(ep, minLat, latRange, minLon, lonRange));
+            }
+        }
+
+        private float[][] retrieveElevationImpl(IElevationProvider ep, double minLat, double latRange, double minLon, double lonRange)
+        {
             float[][] result = new float[pixelHeightInt][];
 
             for (int rIdx = 0; rIdx < pixelHeightInt; rIdx++)
             {
                 double lat = minLat + rIdx * latRange / pixelHeightInt;
                 result[rIdx] = retrieveRowElevation(ep, lat, minLon, lonRange);
-                _progresSubject.OnNext(rIdx*1.0 / pixelHeightInt);
+                _progresSubject.OnNext(rIdx * 1.0 / pixelHeightInt);
+            }
+
+            return result;
+        }
+
+        private async Task<float[][]> retrieveElevationAsyncImpl(IElevationProvider ep, double minLat, double latRange, double minLon, double lonRange)
+        {
+            float[][] result = new float[pixelHeightInt][];
+
+            for (int rIdx = 0; rIdx < pixelHeightInt; rIdx++)
+            {
+                double lat = minLat + rIdx * latRange / pixelHeightInt;
+                result[rIdx] = await retrieveRowElevationAsync(ep, lat, minLon, lonRange);
+                _progresSubject.OnNext(rIdx * 1.0 / pixelHeightInt);
             }
 
             return result;
@@ -256,6 +274,22 @@ namespace NSrtm.Demo
                 double lon = minLon + cIdx * lonRange / pixelWidthInt;
                 var elevation = (float)ep.GetElevation(lat, lon);
                 rowArray[cIdx] = elevation;
+            }
+            return rowArray;
+        }
+
+        [NotNull]
+        private static async Task<float[]> retrieveRowElevationAsync([NotNull] IElevationProvider ep, double lat, double minLon, double lonRange)
+        {
+            if (ep == null) throw new ArgumentNullException("ep");
+
+            var rowArray = new float[pixelWidthInt];
+
+            for (int cIdx = 0; cIdx < pixelWidthInt; cIdx++)
+            {
+                double lon = minLon + cIdx * lonRange / pixelWidthInt;
+                var elevation = await ep.GetElevationAsync(lat, lon);
+                rowArray[cIdx] = (float)elevation;
             }
             return rowArray;
         }
