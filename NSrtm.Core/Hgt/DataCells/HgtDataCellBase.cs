@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace NSrtm.Core
 {
@@ -26,7 +27,7 @@ namespace NSrtm.Core
         }
 
         public abstract long MemorySize { get; }
-
+        public abstract Task<double> GetElevationAsync(double latitude, double longitude);
         protected abstract double ElevationAtOffset(int bytesPos);
     }
 }

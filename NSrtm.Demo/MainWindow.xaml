@@ -47,26 +47,29 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
+                
                 <Label Target="{Binding ElementName=ElevationSourceCombo}" Grid.Row="0" Grid.Column="0">Elevation Mode:</Label>
                 <ComboBox x:Name="ElevationSourceCombo" DisplayMemberPath="Description" Grid.Row="0" Grid.Column="1" />
 
-                <Label Target="{Binding ElementName=LatitudeSlider}" Grid.Row="1" Grid.Column="0">Latitude:</Label>
-                <DockPanel Grid.Row="1" Grid.Column="1">
+                <CheckBox x:Name="UseAsyncApiCheckbox" Content="Use Async API"  Grid.Row="1" Grid.ColumnSpan="2" />
+
+                <Label Target="{Binding ElementName=LatitudeSlider}" Grid.Row="2" Grid.Column="0">Latitude:</Label>
+                <DockPanel Grid.Row="2" Grid.Column="1">
                     <Label x:Name="LatitudeLabel" Style="{StaticResource CoordLookup}" />
                     <Slider Minimum="-90" Maximum="90" x:Name="LatitudeSlider" />
                 </DockPanel>
-                <Label Target="{Binding ElementName=LongitudeSlider}" Grid.Row="2" Grid.Column="0">Longitude:</Label>
-                <DockPanel Grid.Row="2" Grid.Column="1">
+                <Label Target="{Binding ElementName=LongitudeSlider}" Grid.Row="3" Grid.Column="0">Longitude:</Label>
+                <DockPanel Grid.Row="3" Grid.Column="1">
                     <Label x:Name="LongitudeLabel" Style="{StaticResource CoordLookup}" />
                     <Slider Minimum="-180" Maximum="180" x:Name="LongitudeSlider" />
                 </DockPanel>
-                <Label Target="{Binding ElementName=DegreeRangeSlider}" Grid.Row="3" Grid.Column="0">Area (degrees for lat long):</Label>
-                <DockPanel Grid.Row="3" Grid.Column="1">
+                <Label Target="{Binding ElementName=DegreeRangeSlider}" Grid.Row="4" Grid.Column="0">Area (degrees for lat long):</Label>
+                <DockPanel Grid.Row="4" Grid.Column="1">
                     <Label x:Name="DegreeRangeLabel" Style="{StaticResource CoordLookup}" />
                     <Slider Minimum="0.1" Maximum="180" x:Name="DegreeRangeSlider" />
                 </DockPanel>
-                <Label Grid.Row="4" Grid.Column="0" Target="{Binding ElementName=MinVisualizedHeightSlider}">Visualized height:</Label>
-                <controls:RangeSlider Grid.Row="4" Grid.Column="1" Minimum="-100" Maximum="10000"
+                <Label Grid.Row="5" Grid.Column="0" Target="{Binding ElementName=MinVisualizedHeightSlider}">Visualized height:</Label>
+                <controls:RangeSlider Grid.Row="5" Grid.Column="1" Minimum="-100" Maximum="10000"
                                       x:Name="VisualizedHeightSlider" />
             </Grid>
         </GroupBox>

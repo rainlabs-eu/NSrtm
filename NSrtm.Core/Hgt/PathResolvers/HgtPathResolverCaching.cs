@@ -8,30 +8,36 @@ namespace NSrtm.Core
     internal abstract class HgtPathResolverCaching : IHgtPathResolver
     {
         private readonly ConcurrentDictionary<HgtCellCoords, string> _cache = new ConcurrentDictionary<HgtCellCoords, string>();
+        private readonly string _directory;
 
-        public string FindFilePath(string directory, HgtCellCoords coords)
+        protected HgtPathResolverCaching(string directory)
         {
-            return _cache.GetOrAdd(coords, c => findPathForFile(directory, c));
+            _directory = directory;
+        }
+
+        public string FindFilePath(HgtCellCoords coords)
+        {
+            return _cache.GetOrAdd(coords, findPathForFile);
         }
 
         [NotNull]
-        private string findPathForFile([NotNull] string directory, HgtCellCoords coords)
+        private string findPathForFile(HgtCellCoords coords)
         {
             string filename = coordsToFilename(coords);
             string[] potentialPaths =
             {
-                Path.Combine(directory, filename),
-                Path.Combine(directory, "Eurasia", filename),
-                Path.Combine(directory, "Africa", filename),
-                Path.Combine(directory, "South_America", filename),
-                Path.Combine(directory, "North_America", filename),
-                Path.Combine(directory, "Islands", filename),
+                Path.Combine(_directory, filename),
+                Path.Combine(_directory, "Eurasia", filename),
+                Path.Combine(_directory, "Africa", filename),
+                Path.Combine(_directory, "South_America", filename),
+                Path.Combine(_directory, "North_America", filename),
+                Path.Combine(_directory, "Islands", filename),
             };
 
             var path = potentialPaths.FirstOrDefault(File.Exists);
             if (path != null) return path;
 
-            var foundfile = new DirectoryInfo(directory).EnumerateFiles(filename, SearchOption.AllDirectories)
+            var foundfile = new DirectoryInfo(_directory).EnumerateFiles(filename, SearchOption.AllDirectories)
                                                         .FirstOrDefault();
             if (foundfile != null) return foundfile.FullName;
             else throw new HgtFileNotFoundException(coords);

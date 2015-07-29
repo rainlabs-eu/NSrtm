@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
@@ -5,6 +6,8 @@ namespace NSrtm.Core
     internal interface IHgtDataLoader
     {
         [NotNull]
-        byte[] LoadFromFile(string directory, HgtCellCoords coords);
+        byte[] LoadFromFile(HgtCellCoords coords);
+
+        Task<byte[]> LoadFromFileAsync(HgtCellCoords coords);
     }
 }

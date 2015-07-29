@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
@@ -24,5 +25,7 @@ namespace NSrtm.Core
         /// <param name="longitude">Longitude in degrees in WGS84 datum</param>
         /// <returns></returns>
         double GetElevation(double latitude, double longitude);
+
+        Task<double> GetElevationAsync(double latitude, double longitude);
     }
 }

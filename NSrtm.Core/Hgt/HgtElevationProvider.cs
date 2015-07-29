@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core
@@ -46,6 +47,35 @@ namespace NSrtm.Core
             return cell.GetElevation(latitude, longitude);
         }
 
+        public Task<double> GetElevationAsync(double latitude, double longitude)
+        {
+            var coords = HgtCellCoords.ForLatLon(latitude, longitude);
+            IHgtDataCell cellFromCache;
+            if (_cache.TryGetValue(coords, out cellFromCache))
+            {
+                cellFromCache.GetElevationAsync(latitude, longitude);
+            }
+
+            return buildAndCacheCellAndReturnElevationAsync(coords, latitude, longitude);
+        }
+
+        private async Task<double> buildAndCacheCellAndReturnElevationAsync(HgtCellCoords coords, double latitude, double longitude)
+        {
+            IHgtDataCell ret;
+            try
+            {
+                ret = await _cellFactory.GetCellForAsync(coords);
+            }
+            catch (HgtFileException)
+            {
+                ret = HgtDataCellInvalid.Invalid;
+            }
+
+            var cell = _cache.GetOrAdd(coords, ret);
+
+            return await cell.GetElevationAsync(latitude, longitude);
+        }
+
         [NotNull]
         private IHgtDataCell buildCellFor(HgtCellCoords coords)
         {
@@ -68,9 +98,9 @@ namespace NSrtm.Core
         [NotNull]
         public static IElevationProvider CreateInMemoryFromRawFiles([NotNull] string directory)
         {
-            IHgtPathResolver pathResolver = new HgtPathResolverRaw();
+            IHgtPathResolver pathResolver = new HgtPathResolverRaw(directory);
             IHgtDataLoader loader = new HgtDataLoaderFromRaw(pathResolver);
-            return new HgtElevationProvider(new HgtDataCellInMemoryFactory(directory, loader))
+            return new HgtElevationProvider(new HgtDataCellInMemoryFactory(loader))
                    {
                        Name = "SRTM files",
                        Description = string.Format("Unpacked SRTM files (HGT) from directory {0}", directory)
@@ -86,9 +116,9 @@ namespace NSrtm.Core
         [NotNull]
         public static IElevationProvider CreateInMemoryFromZipFiles([NotNull] string directory)
         {
-            IHgtPathResolver pathResolver = new HgtPathResolverZip();
+            IHgtPathResolver pathResolver = new HgtPathResolverZip(directory);
             IHgtDataLoader loader = new HgtDataLoaderFromZip(pathResolver);
-            return new HgtElevationProvider(new HgtDataCellInMemoryFactory(directory, loader))
+            return new HgtElevationProvider(new HgtDataCellInMemoryFactory(loader))
                    {
                        Name = "SRTM files",
                        Description = string.Format("ZIP packed SRTM files (HGT.ZIP) from directory {0}", directory)
@@ -102,11 +132,10 @@ namespace NSrtm.Core
         /// <param name="directory"></param>
         /// <returns>Created provider.</returns>
         [NotNull]
-        public static IElevationProvider CreateMemoryMappedFromRawFiles([NotNull] string directory)
+        public static IElevationProvider CreateDirectDiskAccessFromRawFiles([NotNull] string directory)
         {
-            IHgtPathResolver pathResolver = new HgtPathResolverRaw();
-
-            return new HgtElevationProvider(new HgtDataCellInFileFactory(directory, pathResolver))
+            IHgtPathResolver pathResolver = new HgtPathResolverRaw(directory);
+            return new HgtElevationProvider(new HgtDataCellInFileFactory(pathResolver))
                    {
                        Name = "SRTM files",
                        Description = string.Format("Memory mapped SRTM files (HGT) from directory {0}", directory)
