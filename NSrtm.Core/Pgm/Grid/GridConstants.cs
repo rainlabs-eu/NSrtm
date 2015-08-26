@@ -9,8 +9,9 @@
         private readonly int _gridWidthPoints;
         private readonly int _gridHeightPoints;
         private readonly int _maxValue;
+        private readonly int _preambleLength;
 
-        public GridConstants(double offset, double scale, int orginLat, int orginLon, int gridWidthPoints, int gridHeightPoints, int maxValue)
+        public GridConstants(double offset, double scale, int orginLat, int orginLon, int gridWidthPoints, int gridHeightPoints, int maxValue, int preambleLength)
         {
             _offset = offset;
             _scale = scale;
@@ -19,6 +20,7 @@
             _gridHeightPoints = gridHeightPoints;
             _gridWidthPoints = gridWidthPoints;
             _maxValue = maxValue;
+            _preambleLength = preambleLength;
         }
 
         public double Offset { get { return _offset; } }
@@ -28,6 +30,8 @@
         public int GridWidthPoints { get { return _gridWidthPoints; } }
         public int GridHeightPoints { get { return _gridHeightPoints; } }
         public int MaxValue { get { return _maxValue; } }
-        public int NumberOfPoints { get { return _gridHeightPoints * GridHeightPoints } }
+        public int NumberOfPoints { get { return _gridHeightPoints * _gridWidthPoints; } }
+
+        public int PreambleLength { get { return _preambleLength; } }
     }
 }

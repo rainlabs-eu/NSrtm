@@ -15,6 +15,7 @@ namespace NSrtm.Core.Pgm.Grid
 
         public GridInMemory([NotNull] MemoryStream pgmData, GridConstants pgmParameters)
         {
+            if (pgmData == null) throw new ArgumentNullException("pgmData");
             _pgmParameters = pgmParameters;
             _pgmData = getAsUint16(pgmData)
                 .ToList()
