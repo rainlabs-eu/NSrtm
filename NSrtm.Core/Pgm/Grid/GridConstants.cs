@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NSrtm.Core.Pgm.Grid
+﻿namespace NSrtm.Core.Pgm.Grid
 {
     public struct GridConstants
     {
@@ -28,17 +22,12 @@ namespace NSrtm.Core.Pgm.Grid
         }
 
         public double Offset { get { return _offset; } }
-
         public double Scale { get { return _scale; } }
-
         public int OrginLat { get { return _orginLat; } }
-
         public int OrginLon { get { return _orginLon; } }
-
         public int GridWidthPoints { get { return _gridWidthPoints; } }
-
         public int GridHeightPoints { get { return _gridHeightPoints; } }
-
         public int MaxValue { get { return _maxValue; } }
+        public int NumberOfPoints { get { return _gridHeightPoints * GridHeightPoints } }
     }
 }

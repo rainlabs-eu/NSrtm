@@ -1,8 +1,8 @@
 ﻿namespace NSrtm.Core.Pgm.Grid
 {
-    public interface IGridData
+    public interface IGrid
     {
         double GetClosestData(double latitude, double longitude);
-        GridConstants parameters { get; }
+        GridConstants Parameters { get; }
     }
 }

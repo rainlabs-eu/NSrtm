@@ -44,6 +44,10 @@
       <HintPath>..\packages\JetBrains.Annotations.9.1.1\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MiscUtil, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d3c42c4bfacf7596, processorArchitecture=MSIL">
+      <HintPath>..\packages\JonSkeet.MiscUtil.0.1\lib\net35-Client\MiscUtil.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
@@ -81,7 +85,8 @@
     <Compile Include="Hgt\DataCells\IHgtDataCell.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInvalid.cs" />
     <Compile Include="Pgm\Grid\GridConstants.cs" />
-    <Compile Include="Pgm\Grid\IGridData.cs" />
+    <Compile Include="Pgm\Grid\GridInMemory.cs" />
+    <Compile Include="Pgm\Grid\IGrid.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Hgt\HgtElevationProvider.cs" />
   </ItemGroup>
