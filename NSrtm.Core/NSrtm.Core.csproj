@@ -84,6 +84,7 @@
     <Compile Include="IElevationProvider.cs" />
     <Compile Include="Hgt\DataCells\IHgtDataCell.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInvalid.cs" />
+    <Compile Include="Pgm\Grid\GridBase.cs" />
     <Compile Include="Pgm\Grid\GridConstants.cs" />
     <Compile Include="Pgm\Grid\GridFromFile.cs" />
     <Compile Include="Pgm\Grid\GridInMemory.cs" />
