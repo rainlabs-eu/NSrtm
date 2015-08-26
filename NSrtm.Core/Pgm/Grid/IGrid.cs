@@ -2,7 +2,7 @@
 {
     public interface IGrid
     {
-        double GetClosestData(double latitude, double longitude);
+        double GetClosestUndulationValue(double latitude, double longitude);
         GridConstants Parameters { get; }
     }
 }

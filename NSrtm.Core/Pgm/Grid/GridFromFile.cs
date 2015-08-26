@@ -19,17 +19,13 @@ namespace NSrtm.Core.Pgm.Grid
             _file = stream;
         }
 
-        protected override double getDataFrom(int position)
+        protected override double getUndulationFrom(int position)
         {
             lock (_thisLock)
             {
                 _file.Seek(position + PgmParameters.PreambleLength, SeekOrigin.Begin);
                 UInt16 rawData = (UInt16)(_file.ReadByte() << 8 | _file.ReadByte());
-                if (rawData > PgmParameters.MaxValue)
-                {
-                    throw new ArgumentOutOfRangeException("rawElevation");
-                }
-                return fromRawData(rawData);
+                return fromRawDataToUndulation(rawData);
             }
         }
     }

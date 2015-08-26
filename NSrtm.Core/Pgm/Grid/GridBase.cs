@@ -15,32 +15,36 @@ namespace NSrtm.Core.Pgm.Grid
             PgmParameters = pgmParameters;
         }
 
-        public double GetClosestData(double latitude, double longitude)
+        public double GetClosestUndulationValue(double latitude, double longitude)
         {
-            var position = getClosestDataPosition(latitude, longitude);
-            return getDataFrom(position);
+            var position = getClosestGridPosition(latitude, longitude);
+            return getUndulationFrom(position);
         }
 
-        private int getClosestDataPosition(double latitude, double longitude)
+        private int getClosestGridPosition(double latitude, double longitude)
         {
             var lonStep = PgmParameters.GridWidthPoints / 360.0;
             var latStep = (PgmParameters.GridHeightPoints - 1) / 180.0;
 
             int latPoints = (int)Math.Round((PgmParameters.OrginLat - latitude) * latStep);
             int lonPoints = (int)Math.Round((longitude - PgmParameters.OrginLon) * lonStep);
-            int dataPosition = (lonPoints + latPoints * PgmParameters.GridWidthPoints);
+            int position = (lonPoints + latPoints * PgmParameters.GridWidthPoints);
 
-            if (dataPosition < 0 || dataPosition > PgmParameters.NumberOfPoints)
-                throw new ArgumentOutOfRangeException("dataPosition");
-            return dataPosition;
+            if (position < 0 || position > PgmParameters.NumberOfPoints)
+                throw new ArgumentOutOfRangeException("position");
+            return position;
         }
 
-        protected double fromRawData(int data)
+        protected double fromRawDataToUndulation(int data)
         {
+            if (data < 0 || data > PgmParameters.MaxValue)
+            {
+                throw new ArgumentOutOfRangeException("data");
+            }
             return data * PgmParameters.Scale + PgmParameters.Offset;
         }
 
-        protected abstract double getDataFrom(int position);
+        protected abstract double getUndulationFrom(int position);
 
         public GridConstants Parameters { get { return PgmParameters; } }
     }

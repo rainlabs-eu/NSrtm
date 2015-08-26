@@ -34,14 +34,10 @@ namespace NSrtm.Core.Pgm.Grid
             return data;
         }
 
-        protected override double getDataFrom(int pointPos)
+        protected override double getUndulationFrom(int pointPos)
         {
-            var rawData = _pgmData[pointPos];
-            if (rawData > PgmParameters.MaxValue)
-            {
-                throw new ArgumentOutOfRangeException("rawData");
-            }
-            return fromRawData(rawData);
+            var data = _pgmData[pointPos];
+            return fromRawDataToUndulation(data);
         }
     }
 }
