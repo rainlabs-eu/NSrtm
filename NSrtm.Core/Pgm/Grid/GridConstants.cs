@@ -58,33 +58,29 @@ namespace NSrtm.Core.Pgm.Grid
 
         private static readonly Regex LatLonParser = new Regex("^(?<deg>[-+0-9]+)+(?<pos>[ENSW]*)$");
 
-        public static GridConstants FromPath(string path)
+        public static GridConstants FromStream(StreamReader stream)
         {
-            var preamble = extractPreambleFromPath(path);
+            var preamble = extractPreambleFromStream(stream);
             return getConstatantsFromPreamble(preamble);
         }
 
-        private static string extractPreambleFromPath(string path)
+        private static string extractPreambleFromStream(StreamReader reader)
         {
-            string preamble;
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var reader = new StreamReader(stream))
+            var preamble = reader.ReadLine();
+            if (preamble != _pgmMagicNumber)
             {
-                preamble = reader.ReadLine();
-                if (preamble != _pgmMagicNumber)
-                {
-                    throw new FileFormatException(String.Format("Wrong pgm magic number. Actual {0}, but should be {1}.", preamble, _pgmMagicNumber));
-                }
-
-                string lastLine;
-                do
-                {
-                    lastLine = reader.ReadLine();
-                    preamble += lastLine;
-                    preamble += "\n";
-                } while (lastLine.StartsWith("#"));
-                preamble += reader.ReadLine();
+                throw new FileFormatException(String.Format("Wrong pgm magic number. Actual {0}, but should be {1}.", preamble, _pgmMagicNumber));
             }
+
+            string lastLine;
+            do
+            {
+                lastLine = reader.ReadLine();
+                preamble += lastLine;
+                preamble += "\n";
+            } while (lastLine.StartsWith("#"));
+            preamble += reader.ReadLine();
+
             return preamble;
         }
 

@@ -1,42 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using NSrtm.Core.Pgm.Grid;
+using Ionic.Zip;
+using ZipFile = Ionic.Zip.ZipFile;
 
 namespace NSrtm.Core.Pgm
 {
     public static class PgmGridFactory
     {
-        public static IGrid CreateGridWithDataInMemory(string directory, string fileName)
+        public static IGrid CreateGridWithDataInMemory(string filePath)
         {
-            var path = @"C:\mc\EGS2008ZIP\geoids\egm2008-2_5.pgm";
-            var gridConst = GridParametersExtractor.FromPath(path);
-            var rawData = getDataFromPath(path, gridConst);
-            return new GridInMemory(rawData, gridConst);
-        }
-
-        public static IGrid CreateGridDirectAccess(string directory, string fileName)
-        {
-            var path = @"C:\mc\EGS2008ZIP\geoids\egm2008-2_5.pgm";
-            var gridConst = GridParametersExtractor.FromPath(path);
-            return new GridFromFile(path, gridConst);
-        }
-
-        private static List<ushort> getDataFromPath(string path, GridConstants parameters)
-        {
-            var data = new List<UInt16>();
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var reader = new EndianBinaryReader(EndianBitConverter.Big, stream))
+            if (filePath.Contains("zip"))
             {
-                while (reader.BaseStream.Position <= 2 * parameters.NumberOfPoints + parameters.PreambleLength)
+                var zipDirectory = Path.GetDirectoryName(Path.GetDirectoryName(filePath));
+                using (var zip = ZipFile.Read(zipDirectory))
                 {
-                    data.Add(reader.ReadUInt16());
+                    var entry = zip.Entries.First(v => Path.GetFileName(v.FileName) == Path.GetFileName(filePath));
+                    var stream = new MemoryStream();
+                    entry.Extract(stream);
+                    stream.Position = 0;
+                    var streamReader = new StreamReader(stream);
+                    var gridConst = GridParametersExtractor.FromStream(streamReader);
+                    var rawData = getDataFromPath(streamReader, gridConst);
+                    return new GridInMemory(rawData, gridConst);
                 }
             }
-            return data.Skip(parameters.PreambleLength).ToList();
+            else
+            {
+                var stream = streamFromRaw(filePath);
+                var gridConst = GridParametersExtractor.FromStream(stream);
+                var rawData = getDataFromPath(stream, gridConst);
+                return new GridInMemory(rawData, gridConst);
+            }
+        }
+
+        private static StreamReader streamFromRaw(string filePath)
+        {
+            return new StreamReader(File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read));
+        }
+
+        public static IGrid CreateGridDirectAccess(string filePath)
+        {
+            var gridConst = GridParametersExtractor.FromStream(streamFromRaw(filePath));
+            return new GridFromFile(filePath, gridConst);
+        }
+
+        private static List<ushort> getDataFromPath(StreamReader reader, GridConstants parameters)
+        {
+            var data = new List<UInt16>();
+            using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, reader.BaseStream))
+            {
+                while (reader.BaseStream.Position <= 2 * parameters.NumberOfPoints)
+                {
+                    data.Add(binReader.ReadUInt16());
+                }
+            }
+            return data;
         }
     }
 }
