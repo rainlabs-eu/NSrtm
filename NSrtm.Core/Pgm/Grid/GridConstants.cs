@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace NSrtm.Core.Pgm.Grid
@@ -58,30 +59,33 @@ namespace NSrtm.Core.Pgm.Grid
 
         private static readonly Regex LatLonParser = new Regex("^(?<deg>[-+0-9]+)+(?<pos>[ENSW]*)$");
 
-        public static GridConstants FromStream(StreamReader stream)
+        public static GridConstants FromStream(Stream stream)
         {
             var preamble = extractPreambleFromStream(stream);
             return getConstatantsFromPreamble(preamble);
         }
 
-        private static string extractPreambleFromStream(StreamReader reader)
+        private static string extractPreambleFromStream(Stream stream)
         {
-            var preamble = reader.ReadLine();
-            if (preamble != _pgmMagicNumber)
+            using (var reader = new StreamReader(stream, Encoding.UTF8, false, 1024, true))
             {
-                throw new FileFormatException(String.Format("Wrong pgm magic number. Actual {0}, but should be {1}.", preamble, _pgmMagicNumber));
+                var preamble = reader.ReadLine();
+                if (preamble != _pgmMagicNumber)
+                {
+                    throw new FileFormatException(String.Format("Wrong pgm magic number. Actual {0}, but should be {1}.", preamble, _pgmMagicNumber));
+                }
+
+                string lastLine;
+                do
+                {
+                    lastLine = reader.ReadLine();
+                    preamble += lastLine;
+                    preamble += "\n";
+                } while (lastLine.StartsWith("#"));
+                preamble += reader.ReadLine();
+
+                return preamble;
             }
-
-            string lastLine;
-            do
-            {
-                lastLine = reader.ReadLine();
-                preamble += lastLine;
-                preamble += "\n";
-            } while (lastLine.StartsWith("#"));
-            preamble += reader.ReadLine();
-
-            return preamble;
         }
 
         private static GridConstants getConstatantsFromPreamble(string preamble)

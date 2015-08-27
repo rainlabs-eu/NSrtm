@@ -15,7 +15,7 @@ namespace NSrtm.Core.Pgm
     {
         public static IGrid CreateGridWithDataInMemory(string filePath)
         {
-            if (filePath.Contains("zip"))
+            if (filePath.Contains("zip")) //TODO
             {
                 var zipDirectory = Path.GetDirectoryName(Path.GetDirectoryName(filePath));
                 using (var zip = ZipFile.Read(zipDirectory))
@@ -24,9 +24,8 @@ namespace NSrtm.Core.Pgm
                     var stream = new MemoryStream();
                     entry.Extract(stream);
                     stream.Position = 0;
-                    var streamReader = new StreamReader(stream);
-                    var gridConst = GridParametersExtractor.FromStream(streamReader);
-                    var rawData = getDataFromPath(streamReader, gridConst);
+                    var gridConst = GridParametersExtractor.FromStream(stream);
+                    var rawData = getDataFromPath(stream, gridConst);
                     return new GridInMemory(rawData, gridConst);
                 }
             }
@@ -39,9 +38,9 @@ namespace NSrtm.Core.Pgm
             }
         }
 
-        private static StreamReader streamFromRaw(string filePath)
+        private static Stream streamFromRaw(string filePath)
         {
-            return new StreamReader(File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read));
+            return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
         public static IGrid CreateGridDirectAccess(string filePath)
@@ -50,12 +49,12 @@ namespace NSrtm.Core.Pgm
             return new GridFromFile(filePath, gridConst);
         }
 
-        private static List<ushort> getDataFromPath(StreamReader reader, GridConstants parameters)
+        private static List<ushort> getDataFromPath(Stream stream, GridConstants parameters)
         {
             var data = new List<UInt16>();
-            using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, reader.BaseStream))
+            using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, stream))
             {
-                while (reader.BaseStream.Position <= 2 * parameters.NumberOfPoints)
+                while (stream.Position <= 2 * parameters.NumberOfPoints + parameters.PreambleLength)
                 {
                     data.Add(binReader.ReadUInt16());
                 }
