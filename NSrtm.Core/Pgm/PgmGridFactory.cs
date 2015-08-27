@@ -6,8 +6,6 @@ using System.Linq;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using NSrtm.Core.Pgm.Grid;
-using Ionic.Zip;
-using ZipFile = Ionic.Zip.ZipFile;
 
 namespace NSrtm.Core.Pgm
 {
@@ -15,24 +13,29 @@ namespace NSrtm.Core.Pgm
     {
         public static IGrid CreateGridWithDataInMemory(string filePath)
         {
-            if (filePath.Contains("zip")) //TODO
+            if (filePath.Contains("zip")) //TODO find extensions
             {
                 var zipDirectory = Path.GetDirectoryName(Path.GetDirectoryName(filePath));
-                using (var zip = ZipFile.Read(zipDirectory))
+                using (var zipArchive = ZipFile.OpenRead(zipDirectory))
                 {
-                    var entry = zip.Entries.First(v => Path.GetFileName(v.FileName) == Path.GetFileName(filePath));
-                    var stream = new MemoryStream();
-                    entry.Extract(stream);
-                    stream.Position = 0;
-                    var gridConst = GridParametersExtractor.FromStream(stream);
-                    var rawData = getDataFromPath(stream, gridConst);
-                    return new GridInMemory(rawData, gridConst);
+                    var entry = zipArchive.Entries.First(v => v.Name == Path.GetFileName(filePath));
+                    GridConstants gridConst;
+                    using (var zipStream = entry.Open())
+                    {
+                        gridConst = GridParametersExtractor.FromStream(zipStream);
+                    }
+                    using (var zipStream = entry.Open())
+                    {
+                        var rawData = getDataFromPath(zipStream, gridConst);
+                        return new GridInMemory(rawData, gridConst);
+                    }
                 }
             }
             else
             {
                 var stream = streamFromRaw(filePath);
                 var gridConst = GridParametersExtractor.FromStream(stream);
+                stream.Position = 0;
                 var rawData = getDataFromPath(stream, gridConst);
                 return new GridInMemory(rawData, gridConst);
             }
@@ -54,12 +57,13 @@ namespace NSrtm.Core.Pgm
             var data = new List<UInt16>();
             using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, stream))
             {
-                while (stream.Position <= 2 * parameters.NumberOfPoints + parameters.PreambleLength)
+                for (int i = 0; i < parameters.NumberOfPoints + parameters.PreambleLength / 2; i++)
                 {
                     data.Add(binReader.ReadUInt16());
                 }
             }
-            return data;
+            return data.Skip(parameters.PreambleLength)
+                       .ToList();
         }
     }
 }
