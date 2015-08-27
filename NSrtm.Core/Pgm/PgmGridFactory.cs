@@ -11,7 +11,14 @@ namespace NSrtm.Core.Pgm
 {
     public static class PgmGridFactory
     {
-        public static IPgmGrid CreateGridWithDataInMemory(string filePath)
+        public static IPgmGrid CreateGridInFile(string filePath)
+        {
+            var stream = (FileStream)streamFromRaw(filePath);
+            var gridConst = PgmGridConstantsExtractor.FromStream(stream);
+            return new PgmGridInFile(stream, gridConst);
+        }
+
+        public static IPgmGrid CreateGridInMemory(string filePath)
         {
             if (filePath.Contains("zip")) //TODO find extensions
             {
@@ -24,7 +31,7 @@ namespace NSrtm.Core.Pgm
                     {
                         pgmGridConst = PgmGridConstantsExtractor.FromStream(zipStream);
                     }
-                    using (var zipStream = entry.Open())
+                    using (var zipStream = entry.Open()) //Can not go back to the beginning of the file
                     {
                         var rawData = getDataFromPath(zipStream, pgmGridConst);
                         return new PgmGridInMemory(rawData, pgmGridConst);
@@ -44,13 +51,6 @@ namespace NSrtm.Core.Pgm
         private static Stream streamFromRaw(string filePath)
         {
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        }
-
-        public static IPgmGrid CreateGridDirectAccess(string filePath)
-        {
-            var stream = (FileStream)streamFromRaw(filePath);
-            var gridConst = PgmGridConstantsExtractor.FromStream(stream);
-            return new PgmGridInFile(stream, gridConst);
         }
 
         private static List<ushort> getDataFromPath(Stream stream, PgmGridConstants parameters)
