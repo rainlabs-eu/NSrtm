@@ -59,6 +59,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs">
@@ -84,6 +85,7 @@
     <Compile Include="IElevationProvider.cs" />
     <Compile Include="Hgt\DataCells\IHgtDataCell.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInvalid.cs" />
+    <Compile Include="Pgm\PgmGridFactory.cs" />
     <Compile Include="Pgm\Grid\GridBase.cs" />
     <Compile Include="Pgm\Grid\GridConstants.cs" />
     <Compile Include="Pgm\Grid\GridFromFile.cs" />
