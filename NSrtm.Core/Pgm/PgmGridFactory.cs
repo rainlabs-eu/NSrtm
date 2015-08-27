@@ -11,7 +11,7 @@ namespace NSrtm.Core.Pgm
 {
     public static class PgmGridFactory
     {
-        public static IGrid CreateGridWithDataInMemory(string filePath)
+        public static IPgmGrid CreateGridWithDataInMemory(string filePath)
         {
             if (filePath.Contains("zip")) //TODO find extensions
             {
@@ -19,25 +19,25 @@ namespace NSrtm.Core.Pgm
                 using (var zipArchive = ZipFile.OpenRead(zipDirectory))
                 {
                     var entry = zipArchive.Entries.First(v => v.Name == Path.GetFileName(filePath));
-                    GridConstants gridConst;
+                    PgmGridConstants pgmGridConst;
                     using (var zipStream = entry.Open())
                     {
-                        gridConst = GridParametersExtractor.FromStream(zipStream);
+                        pgmGridConst = PgmGridConstantsExtractor.FromStream(zipStream);
                     }
                     using (var zipStream = entry.Open())
                     {
-                        var rawData = getDataFromPath(zipStream, gridConst);
-                        return new GridInMemory(rawData, gridConst);
+                        var rawData = getDataFromPath(zipStream, pgmGridConst);
+                        return new PgmGridInMemory(rawData, pgmGridConst);
                     }
                 }
             }
             else
             {
                 var stream = streamFromRaw(filePath);
-                var gridConst = GridParametersExtractor.FromStream(stream);
+                var gridConst = PgmGridConstantsExtractor.FromStream(stream);
                 stream.Position = 0;
                 var rawData = getDataFromPath(stream, gridConst);
-                return new GridInMemory(rawData, gridConst);
+                return new PgmGridInMemory(rawData, gridConst);
             }
         }
 
@@ -46,13 +46,14 @@ namespace NSrtm.Core.Pgm
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        public static IGrid CreateGridDirectAccess(string filePath)
+        public static IPgmGrid CreateGridDirectAccess(string filePath)
         {
-            var gridConst = GridParametersExtractor.FromStream(streamFromRaw(filePath));
-            return new GridFromFile(filePath, gridConst);
+            var stream = (FileStream)streamFromRaw(filePath);
+            var gridConst = PgmGridConstantsExtractor.FromStream(stream);
+            return new PgmGridInFile(stream, gridConst);
         }
 
-        private static List<ushort> getDataFromPath(Stream stream, GridConstants parameters)
+        private static List<ushort> getDataFromPath(Stream stream, PgmGridConstants parameters)
         {
             var data = new List<UInt16>();
             using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, stream))

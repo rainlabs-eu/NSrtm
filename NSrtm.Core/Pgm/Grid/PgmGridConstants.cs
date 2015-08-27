@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace NSrtm.Core.Pgm.Grid
 {
-    public struct GridConstants
+    public struct PgmGridConstants
     {
         private readonly double _offset;
         private readonly double _scale;
@@ -20,7 +20,7 @@ namespace NSrtm.Core.Pgm.Grid
         private readonly int _preambleLength;
         private readonly int _numberOfPoints;
 
-        public GridConstants(
+        public PgmGridConstants(
             double offset,
             double scale,
             int orginLat,
@@ -52,14 +52,11 @@ namespace NSrtm.Core.Pgm.Grid
         public int PreambleLength { get { return _preambleLength; } }
     }
 
-    internal static class GridParametersExtractor
+    internal static class PgmGridConstantsExtractor
     {
-        private
-            const string _pgmMagicNumber = "P5";
-
         private static readonly Regex LatLonParser = new Regex("^(?<deg>[-+0-9]+)+(?<pos>[ENSW]*)$");
 
-        public static GridConstants FromStream(Stream stream)
+        public static PgmGridConstants FromStream(Stream stream)
         {
             var preamble = extractPreambleFromStream(stream);
             return getConstatantsFromPreamble(preamble);
@@ -69,6 +66,7 @@ namespace NSrtm.Core.Pgm.Grid
         {
             using (var reader = new StreamReader(stream, Encoding.UTF8, false, 1024, true))
             {
+                const string _pgmMagicNumber = "P5";
                 var preamble = reader.ReadLine();
                 if (preamble != _pgmMagicNumber)
                 {
@@ -88,7 +86,7 @@ namespace NSrtm.Core.Pgm.Grid
             }
         }
 
-        private static GridConstants getConstatantsFromPreamble(string preamble)
+        private static PgmGridConstants getConstatantsFromPreamble(string preamble) //TODO define magic numbers
         {
             var unifyPreamble = preamble.Replace("#", "\n");
             var words = unifyPreamble.Split(' ', '\n')
@@ -96,15 +94,15 @@ namespace NSrtm.Core.Pgm.Grid
             var offset = Convert.ToDouble(words[getParameterIndexUsingName(words, "Offset")], CultureInfo.InvariantCulture);
             var scale = Convert.ToDouble(words[getParameterIndexUsingName(words, "Scale")], CultureInfo.InvariantCulture);
             var latIndex = getParameterIndexUsingName(words, "Origin");
-            var lat = getLatLon(words, latIndex);
-            var lon = getLatLon(words, latIndex + 1);
+            var lat = getLatLonValues(words, latIndex);
+            var lon = getLatLonValues(words, latIndex + 1);
             var indexOfWidthInPreamble = words.Count - 4;
             var width = Convert.ToInt32(words[indexOfWidthInPreamble]);
             int indexOfHightInPreamble = words.Count - 2;
             var hight = Convert.ToInt32(words[indexOfHightInPreamble]);
             var maxValue = Convert.ToInt32(words.Last());
 
-            return new GridConstants(offset, scale, lat, lon, width, hight, maxValue, preamble.Length);
+            return new PgmGridConstants(offset, scale, lat, lon, width, hight, maxValue, preamble.Length);
         }
 
         private static int getParameterIndexUsingName(List<string> words, string parameter)
@@ -112,7 +110,7 @@ namespace NSrtm.Core.Pgm.Grid
             return words.FindIndex(v => v == parameter) + 1;
         }
 
-        private static int getLatLon(List<string> words, int index)
+        private static int getLatLonValues(List<string> words, int index)
         {
             var coord = (words[index]);
             var match = LatLonParser.Match(coord);
@@ -121,12 +119,7 @@ namespace NSrtm.Core.Pgm.Grid
                 throw new ArgumentException(string.Format("Lat/long value of '{0}' is not recognised", coord));
             }
 
-            var deg = int.Parse(match.Groups["deg"].Value);
-            if (match.Groups["pos"].Value[0] == 'S')
-            {
-                deg *= -1;
-            }
-            return deg;
+            return int.Parse(match.Groups["deg"].Value);
         }
     }
 }

@@ -8,11 +8,11 @@ using MiscUtil.IO;
 
 namespace NSrtm.Core.Pgm.Grid
 {
-    public sealed class GridInMemory : GridBase
+    public sealed class PgmGridInMemory : PgmGridBase
     {
         private readonly IReadOnlyList<UInt16> _pgmData;
 
-        public GridInMemory([NotNull] List<UInt16> pgmData, GridConstants pgmParameters)
+        public PgmGridInMemory([NotNull] List<UInt16> pgmData, PgmGridConstants pgmParameters)
             : base(pgmParameters)
         {
             if (pgmData == null) throw new ArgumentNullException("pgmData");

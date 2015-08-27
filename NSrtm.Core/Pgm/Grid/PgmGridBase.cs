@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace NSrtm.Core.Pgm.Grid
 {
-    public abstract class GridBase : IGrid
+    public abstract class PgmGridBase : IPgmGrid
     {
-        protected readonly GridConstants PgmParameters;
+        protected readonly PgmGridConstants PgmParameters;
 
-        protected GridBase(GridConstants pgmParameters)
+        protected PgmGridBase(PgmGridConstants pgmParameters)
         {
             PgmParameters = pgmParameters;
         }
@@ -35,17 +35,17 @@ namespace NSrtm.Core.Pgm.Grid
             return position;
         }
 
-        protected double fromRawDataToUndulation(int data)
+        protected double fromRawDataToUndulation(int rawData)
         {
-            if (data < 0 || data > PgmParameters.MaxValue)
+            if (rawData < 0 || rawData > PgmParameters.MaxValue)
             {
-                throw new ArgumentOutOfRangeException("data");
+                throw new ArgumentOutOfRangeException("rawData");
             }
-            return data * PgmParameters.Scale + PgmParameters.Offset;
+            return rawData * PgmParameters.Scale + PgmParameters.Offset;
         }
 
         protected abstract double getUndulationFrom(int position);
 
-        public GridConstants Parameters { get { return PgmParameters; } }
+        public PgmGridConstants Parameters { get { return PgmParameters; } }
     }
 }
