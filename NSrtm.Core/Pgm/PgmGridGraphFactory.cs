@@ -21,7 +21,7 @@ namespace NSrtm.Core.Pgm
         public static IPgmGridGraph CreateGridGraphInMemory(string filePath)
         {
             var zipDirectory = Path.GetDirectoryName(Path.GetDirectoryName(filePath));
-            if (Path.GetExtension(zipDirectory) == "zip")
+            if (Path.GetExtension(zipDirectory) == ".zip")
             {
                 using (var zipArchive = ZipFile.OpenRead(zipDirectory))
                 {
@@ -33,9 +33,8 @@ namespace NSrtm.Core.Pgm
                     }
                     using (var zipStream = entry.Open()) //Can not go back to the beginning of the file
                     {
-                        var rawData = getDataFromPath(zipStream, pgmGridGraphConst)
-                            .AsReadOnly();
-                        return new PgmGridGraphInMemory(rawData, pgmGridGraphConst);
+                var scaledUndulation = getScaledUndulationFromPath(zipStream, pgmGridGraphConst);
+                return new PgmGridGraphInMemory(scaledUndulation, pgmGridGraphConst);
                     }
                 }
             }
@@ -44,9 +43,8 @@ namespace NSrtm.Core.Pgm
                 var stream = streamFromRaw(filePath);
                 var gridConst = PgmDataDescriptionExtractor.FromStream(stream);
                 stream.Position = 0;
-                var rawData = getDataFromPath(stream, gridConst)
-                    .AsReadOnly();
-                return new PgmGridGraphInMemory(rawData, gridConst);
+                var scaledUndulation = getScaledUndulationFromPath(stream, gridConst);
+                return new PgmGridGraphInMemory(scaledUndulation, gridConst);
             }
         }
 
@@ -55,18 +53,21 @@ namespace NSrtm.Core.Pgm
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        private static List<ushort> getDataFromPath(Stream stream, PgmDataDescription parameters)
+        private static double[] getScaledUndulationFromPath(Stream stream, PgmDataDescription parameters)
         {
-            var data = new List<UInt16>();
+            var dataLength = parameters.NumberOfPoints;
+            var data = new double[dataLength];
             using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, stream))
             {
-                for (int i = 0; i < parameters.NumberOfPoints + parameters.PreambleLength / 2; i++)
+                for (int i = 0; i < dataLength; i++)
                 {
-                    data.Add(binReader.ReadUInt16());
+                    if (i > parameters.PreambleLength / 2)
+                    {
+                        data[i - parameters.PreambleLength / 2] = binReader.ReadUInt16().ToEgmFormat(parameters);
+                    }
                 }
             }
-            return data.Skip(parameters.PreambleLength)
-                       .ToList();
+            return data;
         }
     }
 }

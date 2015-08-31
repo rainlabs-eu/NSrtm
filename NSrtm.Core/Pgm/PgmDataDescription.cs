@@ -58,6 +58,18 @@ namespace NSrtm.Core.Pgm
         public double LongitudeIncrement { get { return _longitudeIncrement; } }
     }
 
+    internal static class PgmRawDataConverter
+    {
+        public static double ToEgmFormat(this UInt16 rawData, PgmDataDescription pgmParameters)
+        {
+            if (rawData > pgmParameters.MaxValue)
+            {
+                throw new ArgumentOutOfRangeException("rawData");
+            }
+            return rawData * pgmParameters.Scale + pgmParameters.Offset;
+        }
+    }
+
     internal static class PgmDataDescriptionExtractor
     {
         private static readonly Regex LatLonParser = new Regex("^(?<deg>[-+0-9]+)+(?<pos>[ENSW]*)$");

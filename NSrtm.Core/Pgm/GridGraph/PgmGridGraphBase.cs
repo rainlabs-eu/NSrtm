@@ -22,15 +22,6 @@ namespace NSrtm.Core.Pgm.GridGraph
             return position;
         }
 
-        protected double fromRawDataToUndulation(int rawData)
-        {
-            if (rawData < 0 || rawData > PgmParameters.MaxValue)
-            {
-                throw new ArgumentOutOfRangeException("rawData");
-            }
-            return rawData * PgmParameters.Scale + PgmParameters.Offset;
-        }
-
         protected abstract double getUndulationFrom(int position);
 
         public double GetUndulation(double latitude, double longitude)

@@ -23,7 +23,7 @@ namespace NSrtm.Core.Pgm.GridGraph
                 var offset = 2 * position + PgmParameters.PreambleLength + 2;
                 _fileStream.Seek(offset, SeekOrigin.Begin);
                 UInt16 rawData = (UInt16)(_fileStream.ReadByte() << 8 | _fileStream.ReadByte());
-                return fromRawDataToUndulation(rawData);
+                return rawData.ToEgmFormat(PgmParameters);
             }
         }
 
