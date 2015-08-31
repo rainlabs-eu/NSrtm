@@ -86,7 +86,6 @@
     <Compile Include="Hgt\DataCells\IHgtDataCell.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInvalid.cs" />
     <Compile Include="Pgm\PgmGridGraphFactory.cs" />
-    <Compile Include="Pgm\GridGraph\PgmGridGraphBase.cs" />
     <Compile Include="Pgm\PgmDataDescription.cs" />
     <Compile Include="Pgm\GridGraph\PgmGridGraphInFile.cs" />
     <Compile Include="Pgm\GridGraph\PgmGridGraphInMemory.cs" />
