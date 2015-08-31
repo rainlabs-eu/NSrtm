@@ -9,7 +9,7 @@ namespace NSrtm.Core.Pgm.GridGraph
         private readonly FileStream _fileStream;
         private readonly Object _thisLock = new Object();
 
-        public PgmGridGraphInFile([NotNull] FileStream stream, PgmGridGraphConstants pgmParameters)
+        public PgmGridGraphInFile([NotNull] FileStream stream, PgmDataDescription pgmParameters)
             : base(pgmParameters)
         {
             if (stream == null) throw new ArgumentNullException("path");

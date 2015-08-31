@@ -4,18 +4,18 @@ namespace NSrtm.Core.Pgm.GridGraph
 {
     public abstract class PgmGridGraphBase : IPgmGridGraph
     {
-        protected readonly PgmGridGraphConstants PgmParameters;
+        protected readonly PgmDataDescription PgmParameters;
 
-        protected PgmGridGraphBase(PgmGridGraphConstants pgmParameters)
+        protected PgmGridGraphBase(PgmDataDescription pgmParameters)
         {
             PgmParameters = pgmParameters;
         }
 
-        private int getClosestGridPosition(double latitude, double longitude)
+        private int getClosestPosition(double latitude, double longitude)
         {
             int latPoints = (int)Math.Round((PgmParameters.OriginLat - latitude) * PgmParameters.LatitudeIncrement);
             int lonPoints = (int)Math.Round((longitude - PgmParameters.OriginLon) * PgmParameters.LongitudeIncrement);
-            int position = (lonPoints + latPoints * PgmParameters.GridWidthPoints);
+            int position = (lonPoints + latPoints * PgmParameters.GridGraphWidthPoints);
 
             if (position < 0 || position > PgmParameters.NumberOfPoints)
                 throw new ArgumentOutOfRangeException("position");
@@ -33,12 +33,12 @@ namespace NSrtm.Core.Pgm.GridGraph
 
         protected abstract double getUndulationFrom(int position);
 
-        public double GetClosestUndulationValue(double latitude, double longitude)
+        public double GetUndulation(double latitude, double longitude)
         {
-            var position = getClosestGridPosition(latitude, longitude);
+            var position = getClosestPosition(latitude, longitude);
             return getUndulationFrom(position);
         }
 
-        public PgmGridGraphConstants Parameters { get { return PgmParameters; } }
+        public PgmDataDescription Parameters { get { return PgmParameters; } }
     }
 }

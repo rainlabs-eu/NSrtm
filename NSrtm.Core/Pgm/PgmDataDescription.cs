@@ -6,29 +6,29 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace NSrtm.Core.Pgm.GridGraph
+namespace NSrtm.Core.Pgm
 {
-    public struct PgmGridGraphConstants
+    public struct PgmDataDescription
     {
         private readonly double _offset;
         private readonly double _scale;
         private readonly int _originLat;
         private readonly int _originLon;
-        private readonly int _gridWidthPoints;
-        private readonly int _gridHeightPoints;
+        private readonly int _gridGraphWidthPoints;
+        private readonly int _gridGraphHeightPoints;
         private readonly int _maxValue;
         private readonly int _preambleLength;
         private readonly int _numberOfPoints;
         private readonly double _latitudeIncrement;
         private readonly double _longitudeIncrement;
 
-        public PgmGridGraphConstants(
+        public PgmDataDescription(
             double offset,
             double scale,
             int originLat,
             int originLon,
-            int gridWidthPoints,
-            int gridHeightPoints,
+            int gridGraphWidthPoints,
+            int gridGraphHeightPoints,
             int maxValue,
             int preambleLength)
         {
@@ -36,21 +36,21 @@ namespace NSrtm.Core.Pgm.GridGraph
             _scale = scale;
             _originLat = originLat;
             _originLon = originLon;
-            _gridHeightPoints = gridHeightPoints;
-            _gridWidthPoints = gridWidthPoints;
+            _gridGraphHeightPoints = gridGraphHeightPoints;
+            _gridGraphWidthPoints = gridGraphWidthPoints;
             _maxValue = maxValue;
             _preambleLength = preambleLength;
-            _numberOfPoints = _gridHeightPoints * _gridWidthPoints;
-            _longitudeIncrement = _gridWidthPoints / 360.0;
-            _latitudeIncrement = (_gridHeightPoints - 1) / 180.0;
+            _numberOfPoints = _gridGraphHeightPoints * _gridGraphWidthPoints;
+            _longitudeIncrement = _gridGraphWidthPoints / 360.0;
+            _latitudeIncrement = (_gridGraphHeightPoints - 1) / 180.0;
         }
 
         public double Offset { get { return _offset; } }
         public double Scale { get { return _scale; } }
         public int OriginLat { get { return _originLat; } }
         public int OriginLon { get { return _originLon; } }
-        public int GridWidthPoints { get { return _gridWidthPoints; } }
-        public int GridHeightPoints { get { return _gridHeightPoints; } }
+        public int GridGraphWidthPoints { get { return _gridGraphWidthPoints; } }
+        public int GridGraphHeightPoints { get { return _gridGraphHeightPoints; } }
         public int MaxValue { get { return _maxValue; } }
         public int NumberOfPoints { get { return _numberOfPoints; } }
         public int PreambleLength { get { return _preambleLength; } }
@@ -58,11 +58,11 @@ namespace NSrtm.Core.Pgm.GridGraph
         public double LongitudeIncrement { get { return _longitudeIncrement; } }
     }
 
-    internal static class PgmGridConstantsExtractor
+    internal static class PgmDataDescriptionExtractor
     {
         private static readonly Regex LatLonParser = new Regex("^(?<deg>[-+0-9]+)+(?<pos>[ENSW]*)$");
 
-        public static PgmGridGraphConstants FromStream(Stream stream)
+        public static PgmDataDescription FromStream(Stream stream)
         {
             var preamble = extractPreambleFromStream(stream);
             return getConstatantsFromPreamble(preamble);
@@ -92,7 +92,7 @@ namespace NSrtm.Core.Pgm.GridGraph
             }
         }
 
-        private static PgmGridGraphConstants getConstatantsFromPreamble(string preamble) //TODO define magic numbers
+        private static PgmDataDescription getConstatantsFromPreamble(string preamble) //TODO define magic numbers
         {
             var unifyPreamble = preamble.Replace("#", "\n");
             var words = unifyPreamble.Split(' ', '\n')
@@ -108,7 +108,7 @@ namespace NSrtm.Core.Pgm.GridGraph
             var hight = Convert.ToInt32(words[indexOfHightInPreamble]);
             var maxValue = Convert.ToInt32(words.Last());
 
-            return new PgmGridGraphConstants(offset, scale, lat, lon, width, hight, maxValue, preamble.Length);
+            return new PgmDataDescription(offset, scale, lat, lon, width, hight, maxValue, preamble.Length);
         }
 
         private static int getParameterIndexUsingName(List<string> words, string parameter)

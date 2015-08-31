@@ -8,7 +8,7 @@ namespace NSrtm.Core.Pgm.GridGraph
     {
         private readonly IReadOnlyList<UInt16> _pgmData;
 
-        public PgmGridGraphInMemory([NotNull] IReadOnlyList<UInt16> pgmData, PgmGridGraphConstants pgmParameters)
+        public PgmGridGraphInMemory([NotNull] IReadOnlyList<UInt16> pgmData, PgmDataDescription pgmParameters)
             : base(pgmParameters)
         {
             if (pgmData == null) throw new ArgumentNullException("pgmData");

@@ -11,14 +11,14 @@ namespace NSrtm.Core.Pgm
 {
     public static class PgmGridGraphFactory
     {
-        public static IPgmGridGraph CreateGridInFile(string filePath)
+        public static IPgmGridGraph CreateGridGraphInFile(string filePath)
         {
             var stream = (FileStream)streamFromRaw(filePath);
-            var gridConst = PgmGridConstantsExtractor.FromStream(stream);
+            var gridConst = PgmDataDescriptionExtractor.FromStream(stream);
             return new PgmGridGraphInFile(stream, gridConst);
         }
 
-        public static IPgmGridGraph CreateGridInMemory(string filePath)
+        public static IPgmGridGraph CreateGridGraphInMemory(string filePath)
         {
             var zipDirectory = Path.GetDirectoryName(Path.GetDirectoryName(filePath));
             if (Path.GetExtension(zipDirectory) == "zip")
@@ -26,10 +26,10 @@ namespace NSrtm.Core.Pgm
                 using (var zipArchive = ZipFile.OpenRead(zipDirectory))
                 {
                     var entry = zipArchive.Entries.First(v => v.Name == Path.GetFileName(filePath));
-                    PgmGridGraphConstants pgmGridGraphConst;
+                    PgmDataDescription pgmGridGraphConst;
                     using (var zipStream = entry.Open())
                     {
-                        pgmGridGraphConst = PgmGridConstantsExtractor.FromStream(zipStream);
+                        pgmGridGraphConst = PgmDataDescriptionExtractor.FromStream(zipStream);
                     }
                     using (var zipStream = entry.Open()) //Can not go back to the beginning of the file
                     {
@@ -42,7 +42,7 @@ namespace NSrtm.Core.Pgm
             else
             {
                 var stream = streamFromRaw(filePath);
-                var gridConst = PgmGridConstantsExtractor.FromStream(stream);
+                var gridConst = PgmDataDescriptionExtractor.FromStream(stream);
                 stream.Position = 0;
                 var rawData = getDataFromPath(stream, gridConst)
                     .AsReadOnly();
@@ -55,7 +55,7 @@ namespace NSrtm.Core.Pgm
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        private static List<ushort> getDataFromPath(Stream stream, PgmGridGraphConstants parameters)
+        private static List<ushort> getDataFromPath(Stream stream, PgmDataDescription parameters)
         {
             var data = new List<UInt16>();
             using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, stream))

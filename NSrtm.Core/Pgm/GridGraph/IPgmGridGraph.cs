@@ -2,7 +2,7 @@
 {
     public interface IPgmGridGraph
     {
-        double GetClosestUndulationValue(double latitude, double longitude);
-        PgmGridGraphConstants Parameters { get; }
+        double GetUndulation(double latitude, double longitude);
+        PgmDataDescription Parameters { get; }
     }
 }
