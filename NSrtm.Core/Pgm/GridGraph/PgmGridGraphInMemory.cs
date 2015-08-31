@@ -6,9 +6,9 @@ namespace NSrtm.Core.Pgm.GridGraph
 {
     public sealed class PgmGridGraphInMemory : PgmGridGraphBase
     {
-        private readonly double[] _scaledUndulation;
+        private readonly UInt16[] _scaledUndulation;
 
-        public PgmGridGraphInMemory([NotNull] double[] scaledUndulation, PgmDataDescription pgmParameters)
+        public PgmGridGraphInMemory([NotNull] UInt16[] scaledUndulation, PgmDataDescription pgmParameters)
             : base(pgmParameters)
         {
             if (scaledUndulation == null) throw new ArgumentNullException("scaledUndulation");
@@ -17,7 +17,8 @@ namespace NSrtm.Core.Pgm.GridGraph
 
         protected override double getUndulationFrom(int pointPos)
         {
-            return _scaledUndulation[pointPos];
+            var scaledUndulation = _scaledUndulation[pointPos];
+            return scaledUndulation.ToEgmFormat(PgmParameters);
         }
     }
 }

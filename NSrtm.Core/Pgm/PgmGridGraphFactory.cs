@@ -53,17 +53,17 @@ namespace NSrtm.Core.Pgm
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        private static double[] getScaledUndulationFromPath(Stream stream, PgmDataDescription parameters)
+        private static UInt16[] getScaledUndulationFromPath(Stream stream, PgmDataDescription parameters)
         {
             var dataLength = parameters.NumberOfPoints;
-            var data = new double[dataLength];
+            var data = new UInt16[dataLength];
             using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, stream))
             {
                 for (int i = 0; i < dataLength; i++)
                 {
                     if (i > parameters.PreambleLength / 2)
                     {
-                        data[i - parameters.PreambleLength / 2] = binReader.ReadUInt16().ToEgmFormat(parameters);
+                        data[i - parameters.PreambleLength / 2] = binReader.ReadUInt16();
                     }
                 }
             }
