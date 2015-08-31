@@ -33,7 +33,7 @@ namespace NSrtm.Core.Pgm
                     }
                     using (var zipStream = entry.Open()) //Can not go back to the beginning of the file
                     {
-                        var rawData = getDataFromPath(zipStream, pgmGridConst);
+                        var rawData = getDataFromPath(zipStream, pgmGridConst).AsReadOnly();
                         return new PgmGridInMemory(rawData, pgmGridConst);
                     }
                 }
@@ -43,7 +43,7 @@ namespace NSrtm.Core.Pgm
                 var stream = streamFromRaw(filePath);
                 var gridConst = PgmGridConstantsExtractor.FromStream(stream);
                 stream.Position = 0;
-                var rawData = getDataFromPath(stream, gridConst);
+                var rawData = getDataFromPath(stream, gridConst).AsReadOnly();
                 return new PgmGridInMemory(rawData, gridConst);
             }
         }

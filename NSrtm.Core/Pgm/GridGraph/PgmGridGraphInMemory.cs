@@ -12,11 +12,11 @@ namespace NSrtm.Core.Pgm.Grid
     {
         private readonly IReadOnlyList<UInt16> _pgmData;
 
-        public PgmGridInMemory([NotNull] List<UInt16> pgmData, PgmGridConstants pgmParameters)
+        public PgmGridInMemory([NotNull] IReadOnlyList<UInt16> pgmData, PgmGridConstants pgmParameters)
             : base(pgmParameters)
         {
             if (pgmData == null) throw new ArgumentNullException("pgmData");
-            _pgmData = pgmData.AsReadOnly();
+            _pgmData = pgmData;
         }
 
         protected override double getUndulationFrom(int pointPos)

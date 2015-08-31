@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace NSrtm.Core.Pgm.Grid
 {
-    public sealed class PgmGridInFile : PgmGridBase
+    public sealed class PgmGridInFile : PgmGridBase, IDisposable
     {
         private readonly FileStream _fileStream;
         private readonly Object _thisLock = new Object();
@@ -25,6 +25,11 @@ namespace NSrtm.Core.Pgm.Grid
                 UInt16 rawData = (UInt16)(_fileStream.ReadByte() << 8 | _fileStream.ReadByte());
                 return fromRawDataToUndulation(rawData);
             }
+        }
+
+        public void Dispose()
+        {
+            _fileStream.Dispose();
         }
     }
 }
