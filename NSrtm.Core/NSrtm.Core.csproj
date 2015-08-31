@@ -85,12 +85,12 @@
     <Compile Include="IElevationProvider.cs" />
     <Compile Include="Hgt\DataCells\IHgtDataCell.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInvalid.cs" />
-    <Compile Include="Pgm\PgmGridFactory.cs" />
-    <Compile Include="Pgm\Grid\PgmGridBase.cs" />
-    <Compile Include="Pgm\Grid\PgmGridConstants.cs" />
-    <Compile Include="Pgm\Grid\PgmGridInFile.cs" />
-    <Compile Include="Pgm\Grid\PgmGridInMemory.cs" />
-    <Compile Include="Pgm\Grid\IPgmGrid.cs" />
+    <Compile Include="Pgm\PgmGridGraphFactory.cs" />
+    <Compile Include="Pgm\GridGraph\PgmGridGraphBase.cs" />
+    <Compile Include="Pgm\GridGraph\PgmGridGraphConstants.cs" />
+    <Compile Include="Pgm\GridGraph\PgmGridGraphInFile.cs" />
+    <Compile Include="Pgm\GridGraph\PgmGridGraphInMemory.cs" />
+    <Compile Include="Pgm\GridGraph\IPgmGridGraph.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Hgt\HgtElevationProvider.cs" />
   </ItemGroup>

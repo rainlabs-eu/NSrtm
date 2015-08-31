@@ -1,8 +1,8 @@
-﻿namespace NSrtm.Core.Pgm.Grid
+﻿namespace NSrtm.Core.Pgm.GridGraph
 {
-    public interface IPgmGrid
+    public interface IPgmGridGraph
     {
         double GetClosestUndulationValue(double latitude, double longitude);
-        PgmGridConstants Parameters { get; }
+        PgmGridGraphConstants Parameters { get; }
     }
 }

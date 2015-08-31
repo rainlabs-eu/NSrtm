@@ -2,14 +2,14 @@
 using System.IO;
 using JetBrains.Annotations;
 
-namespace NSrtm.Core.Pgm.Grid
+namespace NSrtm.Core.Pgm.GridGraph
 {
-    public sealed class PgmGridInFile : PgmGridBase, IDisposable
+    public sealed class PgmGridGraphInFile : PgmGridGraphBase, IDisposable
     {
         private readonly FileStream _fileStream;
         private readonly Object _thisLock = new Object();
 
-        public PgmGridInFile([NotNull] FileStream stream, PgmGridConstants pgmParameters)
+        public PgmGridGraphInFile([NotNull] FileStream stream, PgmGridGraphConstants pgmParameters)
             : base(pgmParameters)
         {
             if (stream == null) throw new ArgumentNullException("path");

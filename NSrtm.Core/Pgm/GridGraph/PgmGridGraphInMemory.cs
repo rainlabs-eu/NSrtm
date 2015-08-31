@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using JetBrains.Annotations;
-using MiscUtil.Conversion;
-using MiscUtil.IO;
 
-namespace NSrtm.Core.Pgm.Grid
+namespace NSrtm.Core.Pgm.GridGraph
 {
-    public sealed class PgmGridInMemory : PgmGridBase
+    public sealed class PgmGridGraphInMemory : PgmGridGraphBase
     {
         private readonly IReadOnlyList<UInt16> _pgmData;
 
-        public PgmGridInMemory([NotNull] IReadOnlyList<UInt16> pgmData, PgmGridConstants pgmParameters)
+        public PgmGridGraphInMemory([NotNull] IReadOnlyList<UInt16> pgmData, PgmGridGraphConstants pgmParameters)
             : base(pgmParameters)
         {
             if (pgmData == null) throw new ArgumentNullException("pgmData");
