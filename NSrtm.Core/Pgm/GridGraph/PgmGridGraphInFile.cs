@@ -12,18 +12,18 @@ namespace NSrtm.Core.Pgm.GridGraph
         public PgmGridGraphInFile([NotNull] FileStream stream, PgmDataDescription pgmParameters)
             : base(pgmParameters)
         {
-            if (stream == null) throw new ArgumentNullException("path");
+            if (stream == null) throw new ArgumentNullException("stream");
             _fileStream = stream;
         }
 
-        protected override double getUndulationFrom(int position)
+        protected override double GetUndulationFrom(int position)
         {
             lock (_thisLock)
             {
-                var offset = 2 * position + PgmParameters.PreambleLength + 2;
+                var offset = 2 * position + Parameters.PreambleLength + 2;
                 _fileStream.Seek(offset, SeekOrigin.Begin);
                 UInt16 rawData = (UInt16)(_fileStream.ReadByte() << 8 | _fileStream.ReadByte());
-                return rawData.ToEgmFormat(PgmParameters);
+                return rawData.ToEgmFormat(Parameters);
             }
         }
 
