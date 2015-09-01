@@ -5,12 +5,11 @@ using JetBrains.Annotations;
 
 namespace NSrtm.Core.Pgm.GridGraph
 {
-    public sealed class PgmGridGraphInMemory : IPgmGridGraph
+    internal sealed class PgmGridGraphInMemory : IPgmGridGraph
     {
         private readonly UInt16[] _scaledUndulation;
         private readonly PgmDataDescription _pgmParameters;
 
-        [CLSCompliantAttribute(false)]
         public PgmGridGraphInMemory([NotNull] UInt16[] scaledUndulation, PgmDataDescription pgmParameters)
         {
             if (scaledUndulation == null) throw new ArgumentNullException("scaledUndulation");

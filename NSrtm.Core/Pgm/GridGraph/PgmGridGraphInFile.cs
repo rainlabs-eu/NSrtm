@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace NSrtm.Core.Pgm.GridGraph
 {
-    public sealed class PgmGridGraphInFile : IPgmGridGraph, IDisposable
+    internal sealed class PgmGridGraphInFile : IPgmGridGraph, IDisposable
     {
         private readonly FileStream _fileStream;
         private readonly Object _thisLock = new Object();

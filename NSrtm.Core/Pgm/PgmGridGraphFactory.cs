@@ -9,7 +9,7 @@ using NSrtm.Core.Pgm.GridGraph;
 
 namespace NSrtm.Core.Pgm
 {
-    public static class PgmGridGraphFactory
+    internal static class PgmGridGraphFactory
     {
         public static IPgmGridGraph CreateGridGraphInFile(string filePath)
         {
