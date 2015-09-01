@@ -86,7 +86,7 @@
     <Compile Include="Hgt\DataCells\IHgtDataCell.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInvalid.cs" />
     <Compile Include="Pgm\DataDesciption\PgmDataDescriptionExtractor.cs" />
-    <Compile Include="Pgm\PgmRawDataConverter.cs" />
+    <Compile Include="Pgm\PgmDataConverter.cs" />
     <Compile Include="Pgm\PgmGridGraphFactory.cs" />
     <Compile Include="Pgm\DataDesciption\PgmDataDescription.cs" />
     <Compile Include="Pgm\GridGraph\PgmGridGraphInFile.cs" />

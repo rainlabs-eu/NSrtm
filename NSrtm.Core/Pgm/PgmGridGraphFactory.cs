@@ -13,7 +13,7 @@ namespace NSrtm.Core.Pgm
     {
         public static IPgmGridGraph CreateGridGraphInFile(string filePath)
         {
-            var stream = (FileStream)streamFromRaw(filePath);
+            var stream = streamFromRaw(filePath);
             var gridConst = PgmDataDescriptionExtractor.FromStream(stream);
             return new PgmGridGraphInFile(stream, gridConst);
         }
@@ -48,7 +48,7 @@ namespace NSrtm.Core.Pgm
             }
         }
 
-        private static Stream streamFromRaw(string filePath)
+        private static FileStream streamFromRaw(string filePath)
         {
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
@@ -61,6 +61,8 @@ namespace NSrtm.Core.Pgm
             {
                 for (int i = 0; i < dataLength; i++)
                 {
+                    var seek = binReader.BaseStream.CanSeek;
+                    var position = binReader.BaseStream.Position;
                     if (i > parameters.PreambleLength / 2)
                     {
                         data[i - parameters.PreambleLength / 2] = binReader.ReadUInt16();

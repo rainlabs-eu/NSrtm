@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using JetBrains.Annotations;
 
@@ -24,22 +23,8 @@ namespace NSrtm.Core.Pgm.GridGraph
             {
                 _fileStream.Seek(position, SeekOrigin.Begin);
                 UInt16 rawData = (UInt16)(_fileStream.ReadByte() << 8 | _fileStream.ReadByte());
-                return rawData.ToEgmFormat(Parameters);
+                return rawData.RawToEgmFormat(_pgmParameters);
             }
-        }
-
-        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly",
-            Justification = "Simple range checking - it makes no sense to create a separate method")]
-        private int getClosestPosition(double latitude, double longitude)
-        {
-            int latPoints = (int)Math.Round((_pgmParameters.OriginLat - latitude) * _pgmParameters.LatitudeIncrement);
-            int lonPoints = (int)Math.Round((longitude - _pgmParameters.OriginLon) * _pgmParameters.LongitudeIncrement);
-            int closestPosition = (lonPoints + latPoints * _pgmParameters.GridGraphWidthPoints);
-
-            if (closestPosition < 0 || closestPosition > _pgmParameters.NumberOfPoints)
-                throw new ArgumentOutOfRangeException("closestPosition");
-            var closestPositionRawData = 2 * closestPosition + Parameters.PreambleLength + 2;
-            return closestPositionRawData;
         }
 
         public void Dispose()
@@ -47,12 +32,11 @@ namespace NSrtm.Core.Pgm.GridGraph
             _fileStream.Dispose();
         }
 
-        public PgmDataDescription Parameters { get { return _pgmParameters; } }
-
         public double GetUndulation(double latitude, double longitude)
         {
-            var position = getClosestPosition(latitude, longitude);
-            return getUndulationFrom(position);
+            int closestPosition = PgmDataConverter.CoordinatesToClosestGridPosition(latitude, longitude, _pgmParameters);
+            var closestPositionInRawData = 2 * closestPosition + _pgmParameters.PreambleLength + 2;
+            return getUndulationFrom(closestPositionInRawData);
         }
     }
 }

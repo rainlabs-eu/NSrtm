@@ -3,6 +3,5 @@
     internal interface IPgmGridGraph
     {
         double GetUndulation(double latitude, double longitude);
-        PgmDataDescription Parameters { get; }
     }
 }
