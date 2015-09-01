@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace NSrtm.Core.Pgm
 {
-    public struct PgmDataDescription : IEquatable<PgmDataDescription>
+    public struct PgmDataDescription
     {
         private readonly double _offset;
         private readonly double _scale;
@@ -45,28 +45,6 @@ namespace NSrtm.Core.Pgm
             _latitudeIncrement = (_gridGraphHeightPoints - 1) / 180.0;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is PgmDataDescription && Equals((PgmDataDescription)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = _offset.GetHashCode();
-                hashCode = (hashCode * 397) ^ _scale.GetHashCode();
-                hashCode = (hashCode * 397) ^ _originLat;
-                hashCode = (hashCode * 397) ^ _originLon;
-                hashCode = (hashCode * 397) ^ _gridGraphWidthPoints;
-                hashCode = (hashCode * 397) ^ _gridGraphHeightPoints;
-                hashCode = (hashCode * 397) ^ _maxValue;
-                hashCode = (hashCode * 397) ^ _preambleLength;
-                return hashCode;
-            }
-        }
-
         public double Offset { get { return _offset; } }
         public double Scale { get { return _scale; } }
         public int OriginLat { get { return _originLat; } }
@@ -78,27 +56,6 @@ namespace NSrtm.Core.Pgm
         public int PreambleLength { get { return _preambleLength; } }
         public double LatitudeIncrement { get { return _latitudeIncrement; } }
         public double LongitudeIncrement { get { return _longitudeIncrement; } }
-
-        public bool Equals(PgmDataDescription other)
-        {
-            return _offset.Equals(other._offset) && _scale.Equals(other._scale) && _originLat == other._originLat && _originLon == other._originLon &&
-                   _gridGraphWidthPoints == other._gridGraphWidthPoints && _gridGraphHeightPoints == other._gridGraphHeightPoints &&
-                   _maxValue == other._maxValue && _preambleLength == other._preambleLength;
-        }
-
-        #region Static Members
-
-        public static bool operator ==(PgmDataDescription left, PgmDataDescription right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(PgmDataDescription left, PgmDataDescription right)
-        {
-            return !left.Equals(right);
-        }
-
-        #endregion
     }
 
     internal static class PgmRawDataConverter
