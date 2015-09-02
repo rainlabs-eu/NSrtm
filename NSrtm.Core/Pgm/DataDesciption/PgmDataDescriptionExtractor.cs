@@ -10,7 +10,7 @@ namespace NSrtm.Core.Pgm
     {
         private static readonly Regex _preambleParser =
             new Regex(
-                @"^(P5)[\S\s]+(?=Offset)[^0-9-]+(?<offset>-?[0-9]+)[\S\s]+(?=Scale)[^0-9-]+(?<scale>-?[0-9]+\.?[0-9]+)[\S\s]+(?=Origin)[^0-9]+(?<lat>[0-9]+)[^0-9]+(?<lon>[0-9]+)[^0-9]+\S+\s(?<width>\d+)\D+(?<height>\d+)\D+(?<max>\d+)$");
+                @"^(P5)[\S\s]+(?=Offset)[^\d-]+(?<offset>-?\d+(\.\d+)?)[\S\s]+(?=Scale)[^\d-]+(?<scale>-?\d+(\.\d+)?)[\S\s]+(?=Origin)[^\d]+(?<lat>\d+)[^\d]+(?<lon>\d+)[^\d]+\S+\s(?<width>\d+)\D+(?<height>\d+)\D+(?<max>\d+)$");
 
         public static PgmDataDescription FromStream(Stream stream)
         {
@@ -20,7 +20,7 @@ namespace NSrtm.Core.Pgm
 
         private static string extractPreambleFromStream(Stream stream)
         {
-            using (var reader = new StreamReader(stream, Encoding.UTF8, false, 1024, true))
+            using (var reader = new StreamReader(stream, Encoding.UTF8, false, 128, true))
             {
                 var preamble = new StringBuilder(reader.ReadLine());
                 string lastLine;
@@ -34,7 +34,7 @@ namespace NSrtm.Core.Pgm
             }
         }
 
-        private static PgmDataDescription getConstatantsFromPreamble(string preamble) //TODO define magic numbers
+        internal static PgmDataDescription getConstatantsFromPreamble(string preamble)
         {
             var match = _preambleParser.Match(preamble);
             if (!match.Success)
@@ -51,5 +51,6 @@ namespace NSrtm.Core.Pgm
 
             return new PgmDataDescription(offset, scale, lat, lon, width, height, maxValue, preamble.Length);
         }
+
     }
 }
