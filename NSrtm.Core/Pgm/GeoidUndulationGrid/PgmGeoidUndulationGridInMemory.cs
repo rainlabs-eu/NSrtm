@@ -19,7 +19,7 @@ namespace NSrtm.Core.Pgm.GeoidUndulationGrid
         {
             var closestPosition = PgmDataConverter.CoordinatesToClosestGridPosition(latitude, longitude, _pgmParameters);
             var scaledUndulation = _scaledUndulation[closestPosition];
-            return scaledUndulation.RawToEgmFormat(_pgmParameters);
+            return scaledUndulation.RawToFinalFormat(_pgmParameters);
         }
     }
 }

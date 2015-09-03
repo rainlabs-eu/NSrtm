@@ -4,7 +4,7 @@ namespace NSrtm.Core.Pgm
 {
     internal static class PgmDataConverter
     {
-        public static double RawToEgmFormat(this UInt16 rawData, PgmDataDescription pgmParameters)
+        public static double RawToFinalFormat(this UInt16 rawData, PgmDataDescription pgmParameters)
         {
             if (rawData > pgmParameters.MaxValue)
             {

@@ -23,7 +23,7 @@ namespace NSrtm.Core.Pgm.GeoidUndulationGrid
             {
                 _fileStream.Seek(position, SeekOrigin.Begin);
                 UInt16 rawData = (UInt16)(_fileStream.ReadByte() << 8 | _fileStream.ReadByte());
-                return rawData.RawToEgmFormat(_pgmParameters);
+                return rawData.RawToFinalFormat(_pgmParameters);
             }
         }
 
