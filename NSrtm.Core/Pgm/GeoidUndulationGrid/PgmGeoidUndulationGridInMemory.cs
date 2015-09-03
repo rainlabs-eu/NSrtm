@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
-namespace NSrtm.Core.Pgm.GridGraph
+namespace NSrtm.Core.Pgm.GeoidUndulationGrid
 {
-    internal sealed class PgmGridGraphInMemory : IPgmGridGraph
+    internal sealed class PgmGeoidUndulationGridInMemory : IPgmGeoidUndulationGrid
     {
         private readonly UInt16[] _scaledUndulation;
         private readonly PgmDataDescription _pgmParameters;
 
-        public PgmGridGraphInMemory([NotNull] UInt16[] scaledUndulation, PgmDataDescription pgmParameters)
+        public PgmGeoidUndulationGridInMemory([NotNull] UInt16[] scaledUndulation, PgmDataDescription pgmParameters)
         {
             if (scaledUndulation == null) throw new ArgumentNullException("scaledUndulation");
             _scaledUndulation = scaledUndulation;

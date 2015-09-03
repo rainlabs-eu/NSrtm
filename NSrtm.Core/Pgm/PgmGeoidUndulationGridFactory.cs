@@ -5,20 +5,20 @@ using System.IO.Compression;
 using System.Linq;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
-using NSrtm.Core.Pgm.GridGraph;
+using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
 {
-    internal static class PgmGridGraphFactory
+    internal static class PgmGeoidUndulationGridFactory
     {
-        public static IPgmGridGraph CreateGridGraphInFile(string filePath)
+        public static IPgmGeoidUndulationGrid CreateGeoidUndulationGridInFile(string filePath)
         {
             var stream = streamFromRaw(filePath);
-            var gridConst = PgmDataDescriptionExtractor.FromStream(stream);
-            return new PgmGridGraphInFile(stream, gridConst);
+            var dataDescription = PgmDataDescriptionExtractor.FromStream(stream);
+            return new PgmGeoidUndulationGridInFile(stream, dataDescription);
         }
 
-        public static IPgmGridGraph CreateGridGraphInMemory(string filePath)
+        public static IPgmGeoidUndulationGrid CreateGeoidUndulationGridInMemory(string filePath)
         {
             var zipDirectory = Path.GetDirectoryName(Path.GetDirectoryName(filePath));
             if (Path.GetExtension(zipDirectory) == ".zip")
@@ -26,25 +26,25 @@ namespace NSrtm.Core.Pgm
                 using (var zipArchive = ZipFile.OpenRead(zipDirectory))
                 {
                     var entry = zipArchive.Entries.First(v => v.Name == Path.GetFileName(filePath));
-                    PgmDataDescription pgmGridGraphConst;
+                    PgmDataDescription dataDescription;
                     using (var zipStream = entry.Open())
                     {
-                        pgmGridGraphConst = PgmDataDescriptionExtractor.FromStream(zipStream);
+                        dataDescription = PgmDataDescriptionExtractor.FromStream(zipStream);
                     }
                     using (var zipStream = entry.Open()) //Can not go back to the beginning of the file
                     {
-                var scaledUndulation = getScaledUndulationFromPath(zipStream, pgmGridGraphConst);
-                return new PgmGridGraphInMemory(scaledUndulation, pgmGridGraphConst);
+                var scaledUndulation = getScaledUndulationFromPath(zipStream, dataDescription);
+                return new PgmGeoidUndulationGridInMemory(scaledUndulation, dataDescription);
                     }
                 }
             }
             else
             {
                 var stream = streamFromRaw(filePath);
-                var gridConst = PgmDataDescriptionExtractor.FromStream(stream);
+                var dataDescription = PgmDataDescriptionExtractor.FromStream(stream);
                 stream.Position = 0;
-                var scaledUndulation = getScaledUndulationFromPath(stream, gridConst);
-                return new PgmGridGraphInMemory(scaledUndulation, gridConst);
+                var scaledUndulation = getScaledUndulationFromPath(stream, dataDescription);
+                return new PgmGeoidUndulationGridInMemory(scaledUndulation, dataDescription);
             }
         }
 
@@ -53,17 +53,17 @@ namespace NSrtm.Core.Pgm
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        private static UInt16[] getScaledUndulationFromPath(Stream stream, PgmDataDescription pgmGridGraphConst)
+        private static UInt16[] getScaledUndulationFromPath(Stream stream, PgmDataDescription dataDescription)
         {
-            var dataLength = pgmGridGraphConst.NumberOfPoints;
+            var dataLength = dataDescription.NumberOfPoints;
             var data = new UInt16[dataLength];
             using (var binReader = new EndianBinaryReader(EndianBitConverter.Big, stream))
             {
                 for (int i = 0; i < dataLength; i++)
                 {
-                    if (i > pgmGridGraphConst.PreambleLength / 2)
+                    if (i > dataDescription.PreambleLength / 2)
                     {
-                        data[i - pgmGridGraphConst.PreambleLength / 2] = binReader.ReadUInt16();
+                        data[i - dataDescription.PreambleLength / 2] = binReader.ReadUInt16();
                     }
                 }
             }

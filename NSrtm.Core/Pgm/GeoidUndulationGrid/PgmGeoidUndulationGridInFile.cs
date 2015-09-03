@@ -2,15 +2,15 @@
 using System.IO;
 using JetBrains.Annotations;
 
-namespace NSrtm.Core.Pgm.GridGraph
+namespace NSrtm.Core.Pgm.GeoidUndulationGrid
 {
-    internal sealed class PgmGridGraphInFile : IPgmGridGraph, IDisposable
+    internal sealed class PgmGeoidUndulationGridInFile : IPgmGeoidUndulationGrid, IDisposable
     {
         private readonly FileStream _fileStream;
         private readonly Object _thisLock = new Object();
         private readonly PgmDataDescription _pgmParameters;
 
-        public PgmGridGraphInFile([NotNull] FileStream stream, PgmDataDescription pgmParameters)
+        public PgmGeoidUndulationGridInFile([NotNull] FileStream stream, PgmDataDescription pgmParameters)
         {
             if (stream == null) throw new ArgumentNullException("stream");
             _fileStream = stream;
