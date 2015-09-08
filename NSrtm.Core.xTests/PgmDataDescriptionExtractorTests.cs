@@ -30,7 +30,7 @@ namespace NSrtm.Core.xTests.Pgm
         internal void PgmGeographicLibPreamblesAreProperlyConvertToDataDescriptions(string preamble, PgmDataDescription expectedDescription)
         {
             var actualDescription = PgmDataDescriptionExtractor.getConstatantsFromPreamble(preamble);
-            Assert.True(AreEqual(actualDescription, expectedDescription));
+            AssertDeep.Equal(actualDescription, expectedDescription);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace NSrtm.Core.xTests.Pgm
         {
             var expectedDescription = new PgmDataDescription(108, 5, 90, 0, 4320, 2161, 65535, 401);
             var actualDescription = PgmDataDescriptionExtractor.getConstatantsFromPreamble(PgmAcceptablePreambles.WithChangedOffsetAndScaleFormat);
-            Assert.True(AreEqual(actualDescription, expectedDescription));
+            AssertDeep.Equal(actualDescription, expectedDescription);
         }
 
         [Fact]
@@ -46,15 +46,7 @@ namespace NSrtm.Core.xTests.Pgm
         {
             var expectedDescription = PgmDataDescriptionExtractor.getConstatantsFromPreamble(PgmGeographicLibPreambles.Egm84WithStep300);
             var actualDescription = PgmDataDescriptionExtractor.getConstatantsFromPreamble(PgmAcceptablePreambles.WithChangedFieldsOrder);
-            Assert.True(AreEqual(actualDescription, expectedDescription));
-        }
-
-        private static bool AreEqual(PgmDataDescription first, PgmDataDescription second)
-        {
-            return first.Offset.Equals(second.Offset) && first.Scale.Equals(second.Scale) && first.OriginLat == second.OriginLat &&
-                   first.OriginLon == second.OriginLon && first.GridGraphWidthPoints == second.GridGraphWidthPoints &&
-                   first.GridGraphHeightPoints == second.GridGraphHeightPoints && first.MaxValue == second.MaxValue &&
-                   first.PreambleLength == second.PreambleLength;
+            AssertDeep.Equal(actualDescription, expectedDescription);
         }
 
         #region Static Members
