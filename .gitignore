@@ -1,10 +1,10 @@
-/.vs
-*/obj
-*/bin
+/src/.vs
+/src/packages/*
+**/obj
+**/bin
 *.user
 *.bak
 *.log
 *.nupkg
 *.exe
-/packages/*
 *.error
