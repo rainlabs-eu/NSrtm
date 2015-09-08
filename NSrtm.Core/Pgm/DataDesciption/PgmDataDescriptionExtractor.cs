@@ -34,7 +34,7 @@ namespace NSrtm.Core.Pgm
 
         private static string extractPreambleFromStream(Stream stream)
         {
-            using (var reader = new StreamReader(stream, Encoding.UTF8, false, 128, true))
+            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
             {
                 var preamble = new StringBuilder(reader.ReadLine());
                 string lastLine;
@@ -67,6 +67,24 @@ namespace NSrtm.Core.Pgm
             var maxValue = Convert.ToInt32(matches["MaxValue"].Groups["maxValue"].Value);
 
             return new PgmDataDescription(offset, scale, lat, lon, width, height, maxValue, preamble.Length);
+        }
+    }
+
+    internal static class BinaryReaderExtension
+    {
+        public static string ReadLine(this BinaryReader reader)
+        {
+            var result = new StringBuilder();
+            char character;
+            while ((character = reader.ReadChar()) != '\n')
+            {
+                if (character != '\r' && character != '\n')
+                {
+                    result.Append(character);
+                }
+            }
+
+            return result.ToString();
         }
     }
 }

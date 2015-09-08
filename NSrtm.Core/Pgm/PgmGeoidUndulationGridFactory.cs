@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -26,26 +25,24 @@ namespace NSrtm.Core.Pgm
                 using (var zipArchive = ZipFile.OpenRead(zipDirectory))
                 {
                     var entry = zipArchive.Entries.First(v => v.Name == Path.GetFileName(filePath));
-                    PgmDataDescription dataDescription;
                     using (var zipStream = entry.Open())
                     {
-                        dataDescription = PgmDataDescriptionExtractor.FromStream(zipStream);
-                    }
-                    using (var zipStream = entry.Open()) //Can not go back to the beginning of the file
-                    {
-                var scaledUndulation = getScaledUndulationFromPath(zipStream, dataDescription);
-                return new PgmGeoidUndulationGridInMemory(scaledUndulation, dataDescription);
+                        return createGeoidUndulationGridInMemoryFromStream(zipStream);
                     }
                 }
             }
             else
             {
                 var stream = streamFromRaw(filePath);
-                var dataDescription = PgmDataDescriptionExtractor.FromStream(stream);
-                stream.Position = 0;
-                var scaledUndulation = getScaledUndulationFromPath(stream, dataDescription);
-                return new PgmGeoidUndulationGridInMemory(scaledUndulation, dataDescription);
+                return createGeoidUndulationGridInMemoryFromStream(stream);
             }
+        }
+
+        private static IPgmGeoidUndulationGrid createGeoidUndulationGridInMemoryFromStream(Stream stream)
+        {
+            var dataDescription = PgmDataDescriptionExtractor.FromStream(stream);
+            var scaledUndulation = getScaledUndulationFromStream(stream, dataDescription);
+            return new PgmGeoidUndulationGridInMemory(scaledUndulation, dataDescription);
         }
 
         private static FileStream streamFromRaw(string filePath)
@@ -53,7 +50,7 @@ namespace NSrtm.Core.Pgm
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        private static UInt16[] getScaledUndulationFromPath(Stream stream, PgmDataDescription dataDescription)
+        private static UInt16[] getScaledUndulationFromStream(Stream stream, PgmDataDescription dataDescription)
         {
             var dataLength = dataDescription.NumberOfPoints;
             var data = new UInt16[dataLength];
@@ -61,10 +58,7 @@ namespace NSrtm.Core.Pgm
             {
                 for (int i = 0; i < dataLength; i++)
                 {
-                    if (i > dataDescription.PreambleLength / 2)
-                    {
-                        data[i - dataDescription.PreambleLength / 2] = binReader.ReadUInt16();
-                    }
+                    data[i] = binReader.ReadUInt16();
                 }
             }
             return data;
