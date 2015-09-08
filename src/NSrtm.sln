@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSrtm.Core", "NSrtm.Core\NSrtm.Core.csproj", "{61F12886-6162-41BD-9DD9-4688B88BF4FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSrtm.Demo", "NSrtm.Demo\NSrtm.Demo.csproj", "{F7707AEC-B6B8-49A3-8B27-1C98042D3E40}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release Nuget|Any CPU = Release Nuget|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Release Nuget|Any CPU.ActiveCfg = Release|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Release Nuget|Any CPU.Build.0 = Release|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61F12886-6162-41BD-9DD9-4688B88BF4FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7707AEC-B6B8-49A3-8B27-1C98042D3E40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7707AEC-B6B8-49A3-8B27-1C98042D3E40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7707AEC-B6B8-49A3-8B27-1C98042D3E40}.Release Nuget|Any CPU.ActiveCfg = Release|Any CPU
+		{F7707AEC-B6B8-49A3-8B27-1C98042D3E40}.Release Nuget|Any CPU.Build.0 = Release|Any CPU
+		{F7707AEC-B6B8-49A3-8B27-1C98042D3E40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7707AEC-B6B8-49A3-8B27-1C98042D3E40}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Alpinechough.Srtm.csproj
+	EndGlobalSection
+EndGlobal
