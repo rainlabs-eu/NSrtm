@@ -15,4 +15,4 @@ using System.Runtime.InteropServices;
 [assembly: CLSCompliant(true)]
 
 [assembly: AssemblyVersion("0.3.0.0")]
-[assembly: AssemblyInformationalVersion("0.3.0-beta1-1-gb350706-0")]
+[assembly: AssemblyInformationalVersion("0.3.0-beta1-4-g56677ea-0")]
