@@ -8,3 +8,4 @@
 *.nupkg
 *.exe
 *.error
+*.orig

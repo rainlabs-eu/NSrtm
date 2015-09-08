@@ -19,6 +19,7 @@ if(($ThisCommitTag -match [regex]'(\d.\d.\d)') -and $Branch.equals("master")) {
     $AssemblyInformationalVersion = "$AssemblyVersion"
     
     Write-Host "Tagged release ($AssemblyInformationalVersion)"
+    Write-Host "##teamcity[buildNumber 'Rel-$AssemblyInformationalVersion']"
 } else {
     Write-Host "`r`nRelease for other branch or not tagged master`r`n"
 
@@ -29,6 +30,7 @@ if(($ThisCommitTag -match [regex]'(\d.\d.\d)') -and $Branch.equals("master")) {
     $AssemblyInformationalVersion = $CurrentDescription.Substring(1) +"-$BuildCounter"
 
     Write-Host "Developer release ($AssemblyInformationalVersion)"
+    Write-Host "##teamcity[buildNumber 'Dev-$AssemblyInformationalVersion']"
 }
 
 Write-Host "AssemblyVersion: $AssemblyVersion"
