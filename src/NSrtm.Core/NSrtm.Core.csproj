@@ -65,6 +65,7 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BiCubicInterpolation\Spline3DCalculator.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInFileFactory.cs" />
     <Compile Include="Hgt\Loaders\HgtDataLoaderFromFileStreamBase.cs" />
     <Compile Include="Hgt\Utils\HgtCellCoords.cs" />
