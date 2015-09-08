@@ -10,6 +10,8 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("Rainlabs")]
 [assembly: AssemblyCopyright("Copyright © 2015 Rainlabs S.C.")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(true)]
