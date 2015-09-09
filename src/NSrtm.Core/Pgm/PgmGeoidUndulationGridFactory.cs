@@ -19,6 +19,7 @@ namespace NSrtm.Core.Pgm
             return new PgmGeoidUndulationGridInFile(stream, dataDescription);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "pgm", Justification = "PGM is a portable graymap shorcut")]
         public static IPgmGeoidUndulationGrid CreateGeoidUndulationGridInMemory(string filePath)
         {
             switch (Path.GetExtension(filePath))
