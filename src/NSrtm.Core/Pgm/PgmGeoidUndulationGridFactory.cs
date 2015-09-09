@@ -36,7 +36,8 @@ namespace NSrtm.Core.Pgm
                     var stream = streamFromRaw(filePath);
                     return createGeoidUndulationGridInMemoryFromStream(stream);
                 default:
-                    throw new InvalidFileTypeException(String.Format("File extension {0} is not the right type, should be .zip or .pgm", Path.GetExtension(filePath)));
+                    throw new InvalidFileTypeException(String.Format("File extension {0} is not the right type, should be .zip or .pgm",
+                                                                     Path.GetExtension(filePath)));
             }
         }
 
