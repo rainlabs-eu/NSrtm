@@ -15,9 +15,9 @@ namespace NSrtm.Core.Pgm
 
         public static int CoordinatesToClosestGridPosition(double latitude, double longitude, PgmDataDescription dataDescription)
         {
-            var gridAbsoluteLat = (dataDescription.OriginLat - latitude) * dataDescription.LatitudeIncrement;
+            var gridAbsoluteLat = (dataDescription.OriginLat - latitude) * dataDescription.LatitudeIncrementDegrees;
             int closestAccessibleGridLat = (int)Math.Round(gridAbsoluteLat);
-            var gridAbsoluteLon = (longitude - dataDescription.OriginLon) * dataDescription.LongitudeIncrement;
+            var gridAbsoluteLon = (longitude - dataDescription.OriginLon) * dataDescription.LongitudeIncrementDegrees;
             int closestAccessibleGridLon = (int)Math.Round(gridAbsoluteLon);
             int closestAccessiblePosition = (closestAccessibleGridLon + closestAccessibleGridLat * dataDescription.GridGraphWidthPoints);
 
