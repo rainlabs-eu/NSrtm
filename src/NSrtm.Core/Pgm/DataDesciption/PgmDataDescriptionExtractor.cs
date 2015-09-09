@@ -29,6 +29,9 @@ namespace NSrtm.Core.Pgm
             return getConstatantsFromPreamble(preamble);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison",
+            MessageId = "System.String.StartsWith(System.String)",
+            Justification = "In this case explicitly setting this parameter only reduces the readability of the code.")]
         private static string extractPreambleFromStream(Stream stream)
         {
             using (var reader = new BinaryReader(stream, Encoding.ASCII, true))
