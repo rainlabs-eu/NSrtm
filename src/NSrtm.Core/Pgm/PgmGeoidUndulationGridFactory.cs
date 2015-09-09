@@ -5,6 +5,7 @@ using System.Linq;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using NSrtm.Core.Pgm.DataDesciption;
+using NSrtm.Core.Pgm.Exceptions;
 using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
@@ -20,21 +21,22 @@ namespace NSrtm.Core.Pgm
 
         public static IPgmGeoidUndulationGrid CreateGeoidUndulationGridInMemory(string filePath)
         {
-            if (Path.GetExtension(filePath) == ".zip")
+            switch (Path.GetExtension(filePath))
             {
-                using (var zipArchive = ZipFile.OpenRead(filePath))
-                {
-                    var entry = zipArchive.Entries.First(v => Path.GetExtension(v.Name) == ".pgm");
-                    using (var zipStream = entry.Open())
+                case ".zip":
+                    using (var zipArchive = ZipFile.OpenRead(filePath))
                     {
-                        return createGeoidUndulationGridInMemoryFromStream(zipStream);
+                        var entry = zipArchive.Entries.First(v => Path.GetExtension(v.Name) == ".pgm");
+                        using (var zipStream = entry.Open())
+                        {
+                            return createGeoidUndulationGridInMemoryFromStream(zipStream);
+                        }
                     }
-                }
-            }
-            else
-            {
-                var stream = streamFromRaw(filePath);
-                return createGeoidUndulationGridInMemoryFromStream(stream);
+                case ".pgm":
+                    var stream = streamFromRaw(filePath);
+                    return createGeoidUndulationGridInMemoryFromStream(stream);
+                default:
+                    throw new InvalidFileTypeException(String.Format("File extension {0} is not the right type, should be .zip or .pgm", Path.GetExtension(filePath)));
             }
         }
 

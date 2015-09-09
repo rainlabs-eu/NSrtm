@@ -86,6 +86,7 @@
     <Compile Include="Hgt\DataCells\IHgtDataCell.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInvalid.cs" />
     <Compile Include="Pgm\DataDesciption\PgmDataDescriptionExtractor.cs" />
+    <Compile Include="Pgm\Exceptions\InvalidFileTypeException.cs" />
     <Compile Include="Pgm\PgmDataConverter.cs" />
     <Compile Include="Pgm\PgmGeoidUndulationGridFactory.cs" />
     <Compile Include="Pgm\DataDesciption\PgmDataDescription.cs" />
