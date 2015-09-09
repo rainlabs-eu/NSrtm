@@ -13,10 +13,10 @@ namespace NSrtm.Core.Pgm
         public static readonly IReadOnlyDictionary<string, Regex> Extractor =
             new Dictionary<string, Regex>
             {
-                {"MagicNumber", new Regex(@"^(P5)[^$]", RegexOptions.Multiline)},
+                {"MagicNumber", new Regex(@"^(P5)[^$]", RegexOptions.Singleline)},
                 {"Offset", new Regex(@"^#[\s]Offset[\s]+(?<offset>.+)$", RegexOptions.Multiline)},
                 {"Scale", new Regex(@"^#[\s]Scale[\s]+(?<scale>.+)$", RegexOptions.Multiline)},
-                {"Origin", new Regex(@"^#[\s]Origin[\s](?<lat>\d+)\D+(?<lon>\d+)", RegexOptions.Multiline)},
+                {"Origin", new Regex(@"^#[\s]Origin[\s](?<lat>\d+)N\s(?<lon>\d+)E", RegexOptions.Multiline)},
                 {"PointParameters", new Regex(@"(\n|\r|\r\n)(?<width>\d+)\s+(?<height>\d+)(\n|\r|\r\n)(?<maxValue>\d+)", RegexOptions.Multiline)},
             };
     }
@@ -31,7 +31,7 @@ namespace NSrtm.Core.Pgm
 
         private static string extractPreambleFromStream(Stream stream)
         {
-            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
+            using (var reader = new BinaryReader(stream, Encoding.ASCII, true))
             {
                 var preamble = new StringBuilder(reader.ReadLine());
                 string lastLine;
@@ -39,7 +39,7 @@ namespace NSrtm.Core.Pgm
                 {
                     lastLine = reader.ReadLine();
                     preamble.Append(lastLine + "\n");
-                } while (lastLine.StartsWith("#", StringComparison.CurrentCulture));
+                } while (lastLine.StartsWith("#"));
                 preamble.Append(reader.ReadLine());
                 return preamble.ToString();
             }
@@ -55,13 +55,13 @@ namespace NSrtm.Core.Pgm
                 throw new ArgumentException(String.Format("Can not extract value {0} from the preamble", match.Key));
             }
 
-            var offset = Convert.ToDouble(matches["Offset"].Groups["offset"].Value, CultureInfo.InvariantCulture);
-            var scale = Convert.ToDouble(matches["Scale"].Groups["scale"].Value, CultureInfo.InvariantCulture);
-            var lat = Convert.ToInt32(matches["Origin"].Groups["lat"].Value);
-            var lon = Convert.ToInt32(matches["Origin"].Groups["lon"].Value);
-            var width = Convert.ToInt32(matches["PointParameters"].Groups["width"].Value);
-            var height = Convert.ToInt32(matches["PointParameters"].Groups["height"].Value);
-            var maxValue = Convert.ToInt32(matches["PointParameters"].Groups["maxValue"].Value);
+            var offset = Double.Parse(matches["Offset"].Groups["offset"].Value, CultureInfo.InvariantCulture);
+            var scale = Double.Parse(matches["Scale"].Groups["scale"].Value, CultureInfo.InvariantCulture);
+            var lat = Int32.Parse(matches["Origin"].Groups["lat"].Value);
+            var lon = Int32.Parse(matches["Origin"].Groups["lon"].Value);
+            var width = Int32.Parse(matches["PointParameters"].Groups["width"].Value);
+            var height = Int32.Parse(matches["PointParameters"].Groups["height"].Value);
+            var maxValue = Int32.Parse(matches["PointParameters"].Groups["maxValue"].Value);
 
             return new PgmDataDescription(offset, scale, lat, lon, width, height, maxValue, preamble.Length);
         }
