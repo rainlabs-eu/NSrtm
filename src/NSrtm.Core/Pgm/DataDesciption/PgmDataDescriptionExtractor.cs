@@ -16,7 +16,7 @@ namespace NSrtm.Core.Pgm.DataDesciption
                 {"MagicNumber", new Regex(@"^(P5)[^$]", RegexOptions.Singleline)},
                 {"Offset", new Regex(@"^#[\s]Offset[\s]+(?<offset>.+)$", RegexOptions.Multiline)},
                 {"Scale", new Regex(@"^#[\s]Scale[\s]+(?<scale>.+)$", RegexOptions.Multiline)},
-                {"Origin", new Regex(@"^#[\s]Origin[\s](?<lat>\d+)N\s(?<lon>\d+)E", RegexOptions.Multiline)},
+                {"Origin", new Regex(@"^#[\s]Origin[\s](?<lat>\d+)(?<latPos>[NS])\s(?<lon>\d+)(?<lonPos>[EW])", RegexOptions.Multiline)},
                 {"PointParameters", new Regex(@"(\n|\r|\r\n)(?<width>\d+)\s+(?<height>\d+)(\n|\r|\r\n)(?<maxValue>\d+)", RegexOptions.Multiline)},
             };
     }
@@ -60,11 +60,14 @@ namespace NSrtm.Core.Pgm.DataDesciption
 
             var offset = Double.Parse(matches["Offset"].Groups["offset"].Value, CultureInfo.InvariantCulture);
             var scale = Double.Parse(matches["Scale"].Groups["scale"].Value, CultureInfo.InvariantCulture);
-            var lat = Int32.Parse(matches["Origin"].Groups["lat"].Value);
-            var lon = Int32.Parse(matches["Origin"].Groups["lon"].Value);
+            var latAngle = Int32.Parse(matches["Origin"].Groups["lat"].Value);
+            var lonAngle = Int32.Parse(matches["Origin"].Groups["lon"].Value);
             var width = Int32.Parse(matches["PointParameters"].Groups["width"].Value);
             var height = Int32.Parse(matches["PointParameters"].Groups["height"].Value);
             var maxValue = Int32.Parse(matches["PointParameters"].Groups["maxValue"].Value);
+
+            var lat = matches["Origin"].Groups["latPos"].Value == "N" ? latAngle : -latAngle;
+            var lon = matches["Origin"].Groups["lonPos"].Value == "E" ? lonAngle : lonAngle + 180;
 
             return new PgmDataDescription(offset, scale, lat, lon, width, height, maxValue, preamble.Length);
         }
