@@ -74,6 +74,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AssertDeep.cs" />
     <Compile Include="PgmDataDescriptionExtractorTests.cs" />
     <Compile Include="PgmPreamblesHelper.cs" />
