@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NSrtm.Core.Pgm;
+using NSrtm.Core.Pgm.DataDesciption;
 using Xunit;
 
 namespace NSrtm.Core.xTests.Pgm

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace NSrtm.Core.Pgm
+namespace NSrtm.Core.Pgm.DataDesciption
 {
     internal static class PgmPreamble
     {

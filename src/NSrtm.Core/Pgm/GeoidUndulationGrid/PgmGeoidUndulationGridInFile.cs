@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using JetBrains.Annotations;
+using NSrtm.Core.Pgm.DataDesciption;
 
 namespace NSrtm.Core.Pgm.GeoidUndulationGrid
 {

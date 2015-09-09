@@ -1,4 +1,4 @@
-﻿namespace NSrtm.Core.Pgm
+﻿namespace NSrtm.Core.Pgm.DataDesciption
 {
     internal struct PgmDataDescription
     {

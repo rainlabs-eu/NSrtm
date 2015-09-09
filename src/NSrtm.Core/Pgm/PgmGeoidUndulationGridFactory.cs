@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Linq;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
+using NSrtm.Core.Pgm.DataDesciption;
 using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
