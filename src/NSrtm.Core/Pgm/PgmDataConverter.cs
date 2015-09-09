@@ -15,6 +15,14 @@ namespace NSrtm.Core.Pgm
 
         public static int CoordinatesToClosestGridPosition(double latitude, double longitude, PgmDataDescription dataDescription)
         {
+            if (dataDescription.OriginLat != 90 || dataDescription.OriginLon != 0)
+            {
+                throw new ArgumentOutOfRangeException("dataDescription",
+                                                      String.Format("Coordinates of the origin are {0} {1}, but should be 90 0.",
+                                                                    dataDescription.OriginLat,
+                                                                    dataDescription.OriginLon));
+            }
+
             var gridAbsoluteLat = (dataDescription.OriginLat - latitude) * dataDescription.LatitudeIncrementDegrees;
             int closestAccessibleGridLat = (int)Math.Round(gridAbsoluteLat);
             var gridAbsoluteLon = (longitude - dataDescription.OriginLon) * dataDescription.LongitudeIncrementDegrees;
