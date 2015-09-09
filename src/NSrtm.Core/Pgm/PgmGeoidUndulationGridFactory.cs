@@ -19,12 +19,11 @@ namespace NSrtm.Core.Pgm
 
         public static IPgmGeoidUndulationGrid CreateGeoidUndulationGridInMemory(string filePath)
         {
-            var zipDirectory = Path.GetDirectoryName(Path.GetDirectoryName(filePath));
-            if (Path.GetExtension(zipDirectory) == ".zip")
+            if (Path.GetExtension(filePath) == ".zip")
             {
-                using (var zipArchive = ZipFile.OpenRead(zipDirectory))
+                using (var zipArchive = ZipFile.OpenRead(filePath))
                 {
-                    var entry = zipArchive.Entries.First(v => v.Name == Path.GetFileName(filePath));
+                    var entry = zipArchive.Entries.First(v => Path.GetExtension(v.Name) == ".pgm");
                     using (var zipStream = entry.Open())
                     {
                         return createGeoidUndulationGridInMemoryFromStream(zipStream);
@@ -41,7 +40,7 @@ namespace NSrtm.Core.Pgm
         private static IPgmGeoidUndulationGrid createGeoidUndulationGridInMemoryFromStream(Stream stream)
         {
             var dataDescription = PgmDataDescriptionExtractor.FromStream(stream);
-            var scaledUndulation = getScaledUndulationFromStream(stream, dataDescription);
+            var scaledUndulation = readScaledUndulationFromStream(stream, dataDescription);
             return new PgmGeoidUndulationGridInMemory(scaledUndulation, dataDescription);
         }
 
@@ -50,7 +49,7 @@ namespace NSrtm.Core.Pgm
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        private static UInt16[] getScaledUndulationFromStream(Stream stream, PgmDataDescription dataDescription)
+        private static UInt16[] readScaledUndulationFromStream(Stream stream, PgmDataDescription dataDescription)
         {
             var dataLength = dataDescription.NumberOfPoints;
             var data = new UInt16[dataLength];
