@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace NSrtm.Core.Pgm.Exceptions
 {
     [Serializable]
-    public class InvalidFileTypeException : Exception
+    internal class InvalidFileTypeException : Exception
     {
         //
         // For guidelines regarding the creation of new exception types, see
