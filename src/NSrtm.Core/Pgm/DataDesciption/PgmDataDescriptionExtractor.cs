@@ -13,7 +13,7 @@ namespace NSrtm.Core.Pgm.DataDesciption
         public static readonly IReadOnlyDictionary<string, Regex> Extractor =
             new Dictionary<string, Regex>
             {
-                {"MagicNumber", new Regex(@"^(P5)[^$]", RegexOptions.Singleline)},
+                {"MagicNumber", new Regex(@"^(P5)", RegexOptions.Singleline)},
                 {"Offset", new Regex(@"^#[\s]Offset[\s]+(?<offset>.+)$", RegexOptions.Multiline)},
                 {"Scale", new Regex(@"^#[\s]Scale[\s]+(?<scale>.+)$", RegexOptions.Multiline)},
                 {"Origin", new Regex(@"^#[\s]Origin[\s](?<lat>\d+)(?<latPos>[NS])\s(?<lon>\d+)(?<lonPos>[EW])", RegexOptions.Multiline)},
