@@ -27,7 +27,7 @@ if(($ThisCommitTag -match [regex]'(\d.\d.\d)') -and $Branch.equals("master")) {
     $CurrentDescription = git describe --match=v*.*.*
 
     $AssemblyVersion = $PreviousTag.Substring(1,5) + ".$BuildCounter";
-    $AssemblyInformationalVersion = $CurrentDescription.Substring(1) +"-$BuildCounter"
+    $AssemblyInformationalVersion = ($CurrentDescription.Substring(1) -replace '-(\d+)-', '-dev$1-') +"-$BuildCounter"
 
     Write-Host "Developer release ($AssemblyInformationalVersion)"
     Write-Host "##teamcity[buildNumber 'Dev-$AssemblyInformationalVersion']"
