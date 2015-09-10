@@ -6,21 +6,18 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace NSrtm.Core.Pgm
+namespace NSrtm.Core.Pgm.DataDesciption
 {
     internal static class PgmPreamble
     {
         public static readonly IReadOnlyDictionary<string, Regex> Extractor =
             new Dictionary<string, Regex>
             {
-                {"MagicNumber", new Regex(@"^(P5)[^$]")},
-                {"Offset", new Regex(@"[\S\s]+(?=Offset)[^\d-]+(?<offset>-?\d+(\.\d+)?)")},
-                {"Scale", new Regex(@"[\S\s]+(?=Scale)[^\d-]+(?<scale>-?\d+(\.\d+)?)")},
-                {"LatitudeOrigin", new Regex(@"[\S\s]+(?=Origin)\D+(?<lat>\d+)")},
-                {"LongitudeOrigin", new Regex(@"[\S\s]+(?=Origin)\D+\d+\D+(?<lon>\d+)")},
-                {"WidthPoints", new Regex(@"(?<width>^\d+)", RegexOptions.Multiline)},
-                {"HeightPoints", new Regex(@"^\d+\D+(?<height>\d+)", RegexOptions.Multiline)},
-                {"MaxValue", new Regex(@"^\d[\S\s]+(?<maxValue>^\d+)$", RegexOptions.Multiline)},
+                {"MagicNumber", new Regex(@"^(P5)", RegexOptions.Singleline)},
+                {"Offset", new Regex(@"^#[\s]Offset[\s]+(?<offset>.+)$", RegexOptions.Multiline)},
+                {"Scale", new Regex(@"^#[\s]Scale[\s]+(?<scale>.+)$", RegexOptions.Multiline)},
+                {"Origin", new Regex(@"^#[\s]Origin[\s](?<lat>\d+)(?<latPos>[NS])\s(?<lon>\d+)(?<lonPos>[EW])", RegexOptions.Multiline)},
+                {"PointParameters", new Regex(@"(\n|\r|\r\n)(?<width>\d+)\s+(?<height>\d+)(\n|\r|\r\n)(?<maxValue>\d+)", RegexOptions.Multiline)},
             };
     }
 
@@ -32,9 +29,12 @@ namespace NSrtm.Core.Pgm
             return getConstatantsFromPreamble(preamble);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison",
+            MessageId = "System.String.StartsWith(System.String)",
+            Justification = "In this case explicitly setting this parameter only reduces the readability of the code.")]
         private static string extractPreambleFromStream(Stream stream)
         {
-            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
+            using (var reader = new BinaryReader(stream, Encoding.ASCII, true))
             {
                 var preamble = new StringBuilder(reader.ReadLine());
                 string lastLine;
@@ -42,7 +42,7 @@ namespace NSrtm.Core.Pgm
                 {
                     lastLine = reader.ReadLine();
                     preamble.Append(lastLine + "\n");
-                } while (lastLine.StartsWith("#", StringComparison.CurrentCulture));
+                } while (lastLine.StartsWith("#"));
                 preamble.Append(reader.ReadLine());
                 return preamble.ToString();
             }
@@ -58,13 +58,16 @@ namespace NSrtm.Core.Pgm
                 throw new ArgumentException(String.Format("Can not extract value {0} from the preamble", match.Key));
             }
 
-            var offset = Convert.ToDouble(matches["Offset"].Groups["offset"].Value, CultureInfo.InvariantCulture);
-            var scale = Convert.ToDouble(matches["Scale"].Groups["scale"].Value, CultureInfo.InvariantCulture);
-            var lat = Convert.ToInt32(matches["LatitudeOrigin"].Groups["lat"].Value);
-            var lon = Convert.ToInt32(matches["LongitudeOrigin"].Groups["lon"].Value);
-            var width = Convert.ToInt32(matches["WidthPoints"].Groups["width"].Value);
-            var height = Convert.ToInt32(matches["HeightPoints"].Groups["height"].Value);
-            var maxValue = Convert.ToInt32(matches["MaxValue"].Groups["maxValue"].Value);
+            var offset = Double.Parse(matches["Offset"].Groups["offset"].Value, CultureInfo.InvariantCulture);
+            var scale = Double.Parse(matches["Scale"].Groups["scale"].Value, CultureInfo.InvariantCulture);
+            var latAngle = Int32.Parse(matches["Origin"].Groups["lat"].Value);
+            var lonAngle = Int32.Parse(matches["Origin"].Groups["lon"].Value);
+            var width = Int32.Parse(matches["PointParameters"].Groups["width"].Value);
+            var height = Int32.Parse(matches["PointParameters"].Groups["height"].Value);
+            var maxValue = Int32.Parse(matches["PointParameters"].Groups["maxValue"].Value);
+
+            var lat = matches["Origin"].Groups["latPos"].Value == "N" ? latAngle : -latAngle;
+            var lon = matches["Origin"].Groups["lonPos"].Value == "E" ? lonAngle : lonAngle + 180;
 
             return new PgmDataDescription(offset, scale, lat, lon, width, height, maxValue, preamble.Length);
         }

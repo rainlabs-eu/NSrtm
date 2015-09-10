@@ -4,6 +4,8 @@ using System.IO.Compression;
 using System.Linq;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
+using NSrtm.Core.Pgm.DataDesciption;
+using NSrtm.Core.Pgm.Exceptions;
 using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
@@ -17,31 +19,33 @@ namespace NSrtm.Core.Pgm
             return new PgmGeoidUndulationGridInFile(stream, dataDescription);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "pgm", Justification = "PGM is a portable graymap shorcut")]
         public static IPgmGeoidUndulationGrid CreateGeoidUndulationGridInMemory(string filePath)
         {
-            var zipDirectory = Path.GetDirectoryName(Path.GetDirectoryName(filePath));
-            if (Path.GetExtension(zipDirectory) == ".zip")
+            switch (Path.GetExtension(filePath))
             {
-                using (var zipArchive = ZipFile.OpenRead(zipDirectory))
-                {
-                    var entry = zipArchive.Entries.First(v => v.Name == Path.GetFileName(filePath));
-                    using (var zipStream = entry.Open())
+                case ".zip":
+                    using (var zipArchive = ZipFile.OpenRead(filePath))
                     {
-                        return createGeoidUndulationGridInMemoryFromStream(zipStream);
+                        var entry = zipArchive.Entries.First(v => Path.GetExtension(v.Name) == ".pgm");
+                        using (var zipStream = entry.Open())
+                        {
+                            return createGeoidUndulationGridInMemoryFromStream(zipStream);
+                        }
                     }
-                }
-            }
-            else
-            {
-                var stream = streamFromRaw(filePath);
-                return createGeoidUndulationGridInMemoryFromStream(stream);
+                case ".pgm":
+                    var stream = streamFromRaw(filePath);
+                    return createGeoidUndulationGridInMemoryFromStream(stream);
+                default:
+                    throw new InvalidFileTypeException(String.Format("File extension {0} is not the right type, should be .zip or .pgm",
+                                                                     Path.GetExtension(filePath)));
             }
         }
 
         private static IPgmGeoidUndulationGrid createGeoidUndulationGridInMemoryFromStream(Stream stream)
         {
             var dataDescription = PgmDataDescriptionExtractor.FromStream(stream);
-            var scaledUndulation = getScaledUndulationFromStream(stream, dataDescription);
+            var scaledUndulation = readScaledUndulationFromStream(stream, dataDescription);
             return new PgmGeoidUndulationGridInMemory(scaledUndulation, dataDescription);
         }
 
@@ -50,7 +54,7 @@ namespace NSrtm.Core.Pgm
             return File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
 
-        private static UInt16[] getScaledUndulationFromStream(Stream stream, PgmDataDescription dataDescription)
+        private static UInt16[] readScaledUndulationFromStream(Stream stream, PgmDataDescription dataDescription)
         {
             var dataLength = dataDescription.NumberOfPoints;
             var data = new UInt16[dataLength];

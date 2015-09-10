@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NSrtm.Core.Pgm;
+using NSrtm.Core.Pgm.DataDesciption;
 using Xunit;
 
 namespace NSrtm.Core.xTests.Pgm
@@ -36,7 +37,7 @@ namespace NSrtm.Core.xTests.Pgm
         [Fact]
         public void CorrectPreambleWithChangedOffsetAndScaleFormatExtractCorrectly()
         {
-            var expectedDescription = new PgmDataDescription(108, 5, 90, 0, 4320, 2161, 65535, 401);
+            var expectedDescription = new PgmDataDescription(108, 5, 90, 0, 4320, 2161, 65535, 416);
             var actualDescription = PgmDataDescriptionExtractor.getConstatantsFromPreamble(PgmAcceptablePreambles.WithChangedOffsetAndScaleFormat);
             AssertDeep.Equal(actualDescription, expectedDescription);
         }
@@ -57,13 +58,13 @@ namespace NSrtm.Core.xTests.Pgm
             {
                 return new List<object[]>
                        {
-                           new object[] {PgmGeographicLibPreambles.Egm2008WithStep10, new PgmDataDescription(-108, 0.003, 90, 0, 21600, 10801, 65535, 403)},
-                           new object[] {PgmGeographicLibPreambles.Egm2008WithStep25, new PgmDataDescription(-108, 0.003, 90, 0, 8640, 4321, 65535, 403)},
-                           new object[] {PgmGeographicLibPreambles.Egm2008WithStep50, new PgmDataDescription(-108, 0.003, 90, 0, 4320, 2161, 65535, 403)},
-                           new object[] {PgmGeographicLibPreambles.Egm96WithStep50, new PgmDataDescription(-108, 0.003, 90, 0, 4320, 2161, 65535, 407)},
-                           new object[] {PgmGeographicLibPreambles.Egm96WithStep150, new PgmDataDescription(-108, 0.003, 90, 0, 1440, 721, 65535, 407)},
-                           new object[] {PgmGeographicLibPreambles.Egm84WithStep150, new PgmDataDescription(-108, 0.003, 90, 0, 1440, 721, 65535, 415)},
-                           new object[] {PgmGeographicLibPreambles.Egm84WithStep300, new PgmDataDescription(-108, 0.003, 90, 0, 720, 361, 65535, 415)},
+                           new object[] {PgmGeographicLibPreambles.Egm2008WithStep10, new PgmDataDescription(-108, 0.003, 90, 0, 21600, 10801, 65535, 418)},
+                           new object[] {PgmGeographicLibPreambles.Egm2008WithStep25, new PgmDataDescription(-108, 0.003, 90, 0, 8640, 4321, 65535, 418)},
+                           new object[] {PgmGeographicLibPreambles.Egm2008WithStep50, new PgmDataDescription(-108, 0.003, 90, 0, 4320, 2161, 65535, 418)},
+                           new object[] {PgmGeographicLibPreambles.Egm96WithStep50, new PgmDataDescription(-108, 0.003, 90, 0, 4320, 2161, 65535, 422)},
+                           new object[] {PgmGeographicLibPreambles.Egm96WithStep150, new PgmDataDescription(-108, 0.003, 90, 0, 1440, 721, 65535, 422)},
+                           new object[] {PgmGeographicLibPreambles.Egm84WithStep150, new PgmDataDescription(-108, 0.003, 90, 0, 1440, 721, 65535, 430)},
+                           new object[] {PgmGeographicLibPreambles.Egm84WithStep300, new PgmDataDescription(-108, 0.003, 90, 0, 720, 361, 65535, 430)},
                        };
             }
         }
