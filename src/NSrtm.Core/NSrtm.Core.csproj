@@ -97,6 +97,7 @@
     <Compile Include="Pgm\GeoidUndulationGrid\IPgmGeoidUndulationGrid.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Hgt\HgtElevationProvider.cs" />
+    <Compile Include="Composer\SubtractingComposerElevationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NSrtm.Core.csproj.DotSettings" />
