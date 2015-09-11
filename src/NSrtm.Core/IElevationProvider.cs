@@ -4,20 +4,10 @@ using JetBrains.Annotations;
 namespace NSrtm.Core
 {
     /// <summary>
-    ///     Provides elevation of ground for WGS84 locations.
+    ///     Provides elevation for WGS84 locations.
     /// </summary>
     public interface IElevationProvider
     {
-        /// <summary>
-        ///     Short name describing implementation. Used for UI/Demos where different implementations are available.
-        /// </summary>
-        [NotNull] string Name { get; }
-
-        /// <summary>
-        ///     More descriptive info about implementation. Used for UI/Demos where different implementations are available.
-        /// </summary>
-        [NotNull] string Description { get; }
-
         /// <summary>
         ///     Gets elevation above MSL
         /// </summary>
@@ -33,5 +23,15 @@ namespace NSrtm.Core
         /// <param name="longitude"></param>
         /// <returns></returns>
         Task<double> GetElevationAsync(double latitude, double longitude);
+
+        /// <summary>
+        /// Base level (for this level elevation provider returns zero)
+        /// </summary>
+        Level ElevationBase { get; }
+
+        /// <summary>
+        /// Target Level - this level measured relatively to Base is returned
+        /// </summary>
+        Level ElevationTarget { get; }
     }
 }
