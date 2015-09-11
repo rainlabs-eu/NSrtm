@@ -85,6 +85,7 @@
     <Compile Include="IElevationProvider.cs" />
     <Compile Include="Hgt\DataCells\IHgtDataCell.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInvalid.cs" />
+    <Compile Include="Level.cs" />
     <Compile Include="Pgm\DataDesciption\PgmDataDescriptionExtractor.cs" />
     <Compile Include="Pgm\Exceptions\InvalidFileTypeException.cs" />
     <Compile Include="Pgm\PgmDataConverter.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Hgt\HgtElevationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="NSrtm.Core.csproj.DotSettings" />
     <None Include="NSrtm.Core.nuspec" />
     <None Include="NSrtm.Core.ruleset" />
     <None Include="nuget-pack.ps1" />
