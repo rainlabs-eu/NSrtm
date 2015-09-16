@@ -41,12 +41,9 @@ namespace NSrtm.Core
             var positiveTask = _providerPositive.GetElevationAsync(latitude, longitude);
             var negativeTask = _providerNegative.GetElevationAsync(latitude, longitude);
 
-            await Task.WhenAll(positiveTask, negativeTask);
+            double[] results = await Task.WhenAll(positiveTask, negativeTask);
 
-            double positive = await positiveTask;
-            double negative = await negativeTask;
-
-            return positive - negative;
+            return results[0] - results[1];
         }
 
         public Level ElevationBase { get { return _providerNegative.ElevationTarget; } }
