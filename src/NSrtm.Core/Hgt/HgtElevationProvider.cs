@@ -25,12 +25,14 @@ namespace NSrtm.Core
         /// <summary>
         ///     Short name describing implementation. Used for UI/Demos where different implementations are available.
         /// </summary>
-        [NotNull] public string Name { get; set; }
+        [NotNull]
+        public string Name { get; set; }
 
         /// <summary>
         ///     More descriptive info about implementation. Used for UI/Demos where different implementations are available.
         /// </summary>
-        [NotNull] public string Description { get; set; }
+        [NotNull]
+        public string Description { get; set; }
 
         /// <summary>
         ///     Gets elevation above MSL
@@ -64,6 +66,10 @@ namespace NSrtm.Core
 
             return buildAndCacheCellAndReturnElevationAsync(coords, latitude, longitude);
         }
+
+        public Level ElevationBase { get { return Level.EllipsoidWgs84; } }
+
+        public Level ElevationTarget { get { return Level.Terrain; } }
 
         private async Task<double> buildAndCacheCellAndReturnElevationAsync(HgtCellCoords coords, double latitude, double longitude)
         {
