@@ -22,5 +22,7 @@ namespace NSrtm.Core.Pgm.GeoidUndulationGrid
             var scaledUndulation = _scaledUndulation[closestPosition];
             return scaledUndulation.RawToFinalFormat(_pgmParameters);
         }
+
+        public PgmDataDescription PgmParameters { get { return _pgmParameters; } }
     }
 }

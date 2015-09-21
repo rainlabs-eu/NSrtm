@@ -39,5 +39,7 @@ namespace NSrtm.Core.Pgm.GeoidUndulationGrid
             var closestPositionInRawData = 2 * closestPosition + _pgmParameters.PreambleLength + 2;
             return getUndulationFrom(closestPositionInRawData);
         }
+
+        public PgmDataDescription PgmParameters { get { return _pgmParameters; } }
     }
 }
