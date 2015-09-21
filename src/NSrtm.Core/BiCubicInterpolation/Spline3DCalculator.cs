@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace NSrtm.Core.BiCubicInterpolation
+namespace NSrtm.Core.BicubicInterpolation
 {
     public class Spline3DCalculator
     {
+        private Spline3DCalculator()
+        {
+        }
+
         /// <summary>
         ///     Finding derivatives from 2-d function values - https://en.wikipedia.org/wiki/Bicubic_interpolation
         ///     using centered differencing formula (5.4)
@@ -35,7 +39,7 @@ namespace NSrtm.Core.BiCubicInterpolation
 
             for (int i = 0; i < _linearEquationCoefficients.GetLength(0); i++)
             {
-                double coefficient = x.Select((t, j) => _linearEquationCoefficients[i, j] * t)
+                double coefficient = x.Select((t, j) => _linearEquationCoefficients[i][j] * t)
                                       .Sum();
                 coefficients.Add(coefficient);
             }
@@ -83,25 +87,24 @@ namespace NSrtm.Core.BiCubicInterpolation
 
         #region Static Members
 
-        private static readonly int[,] _linearEquationCoefficients =
-
+        private static readonly int[][] _linearEquationCoefficients =
         {
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {-3, 3, 0, 0, -2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {2, -2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, -3, 3, 0, 0, -2, -1, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 2, -2, 0, 0, 1, 1, 0, 0},
-            {-3, 0, 3, 0, 0, 0, 0, 0, -2, 0, -1, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, -3, 0, 3, 0, 0, 0, 0, 0, -2, 0, -1, 0},
-            {9, -9, -9, 9, 6, 3, -6, -3, 6, -6, 3, -3, 4, 2, 2, 1},
-            {-6, 6, 6, -6, -3, -3, 3, 3, -4, 4, -2, 2, -2, -2, -1, -1},
-            {2, 0, -2, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 2, 0, -2, 0, 0, 0, 0, 0, 1, 0, 1, 0},
-            {-6, 6, 6, -6, -4, -2, 4, 2, -3, 3, -3, 3, -2, -1, -2, -1},
-            {4, -4, -4, 4, 2, 2, -2, -2, 2, -2, 2, -2, 1, 1, 1, 1}
+            new int[] {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            new int[] {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            new int[] {-3, 3, 0, 0, -2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            new int[] {2, -2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            new int[] {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+            new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+            new int[] {0, 0, 0, 0, 0, 0, 0, 0, -3, 3, 0, 0, -2, -1, 0, 0},
+            new int[] {0, 0, 0, 0, 0, 0, 0, 0, 2, -2, 0, 0, 1, 1, 0, 0},
+            new int[] {-3, 0, 3, 0, 0, 0, 0, 0, -2, 0, -1, 0, 0, 0, 0, 0},
+            new int[] {0, 0, 0, 0, -3, 0, 3, 0, 0, 0, 0, 0, -2, 0, -1, 0},
+            new int[] {9, -9, -9, 9, 6, 3, -6, -3, 6, -6, 3, -3, 4, 2, 2, 1},
+            new int[] {-6, 6, 6, -6, -3, -3, 3, 3, -4, 4, -2, 2, -2, -2, -1, -1},
+            new int[] {2, 0, -2, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0},
+            new int[] {0, 0, 0, 0, 2, 0, -2, 0, 0, 0, 0, 0, 1, 0, 1, 0},
+            new int[] {-6, 6, 6, -6, -4, -2, 4, 2, -3, 3, -3, 3, -2, -1, -2, -1},
+            new int[] {4, -4, -4, 4, 2, 2, -2, -2, 2, -2, 2, -2, 1, 1, 1, 1}
         };
 
         /// <summary>
@@ -111,7 +114,7 @@ namespace NSrtm.Core.BiCubicInterpolation
         /// <param name="values">function values,  (4×4)</param>
         /// <param name="step">Distance between the nodes</param>
         /// <returns>Func with spline interpolant</returns>
-        public static BivariatePolynomial GetBiCubicSpline([NotNull] IReadOnlyList<IReadOnlyList<double>> values, double step)
+        public static BivariatePolynomial GetBicubicSpline([NotNull] IReadOnlyList<IReadOnlyList<double>> values, double step)
         {
             if (values == null) throw new ArgumentNullException("values");
             if (step <= 0) throw new ArgumentOutOfRangeException("step", "Step must be positive");

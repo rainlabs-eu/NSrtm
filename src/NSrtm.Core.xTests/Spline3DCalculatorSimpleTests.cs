@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using NSrtm.Core.BiCubicInterpolation;
+using NSrtm.Core.BicubicInterpolation;
 using Xunit;
 
 namespace NSrtm.Core.xTests
@@ -10,7 +10,7 @@ namespace NSrtm.Core.xTests
         [Fact]
         public void EmptyValuesContainerThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => Spline3DCalculator.GetBiCubicSpline(null, 1));
+            Assert.Throws<ArgumentNullException>(() => Spline3DCalculator.GetBicubicSpline(null, 1));
         }
 
         [Fact]
@@ -18,7 +18,7 @@ namespace NSrtm.Core.xTests
         {
             Assert.Throws<ArgumentException>(
                                                  () =>
-                                                 Spline3DCalculator.GetBiCubicSpline(
+                                                 Spline3DCalculator.GetBicubicSpline(
                                                                                      new List<List<double>>
                                                                                      {
                                                                                          new List<double> {1, 2, 3, 4},
@@ -33,7 +33,7 @@ namespace NSrtm.Core.xTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(
                                                  () =>
-                                                 Spline3DCalculator.GetBiCubicSpline(
+                                                 Spline3DCalculator.GetBicubicSpline(
                                                                                      new List<List<double>>
                                                                                      {
                                                                                          new List<double> {1, 2, 3, 4},
@@ -48,7 +48,7 @@ namespace NSrtm.Core.xTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(
                                                  () =>
-                                                 Spline3DCalculator.GetBiCubicSpline(
+                                                 Spline3DCalculator.GetBicubicSpline(
                                                                                      new List<List<double>>
                                                                                      {
                                                                                          new List<double> {1, 2, 3, 4},

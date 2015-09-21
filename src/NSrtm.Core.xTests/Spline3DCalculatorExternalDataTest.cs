@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using NSrtm.Core.BiCubicInterpolation;
+using NSrtm.Core.BicubicInterpolation;
 using Xunit;
 
 namespace NSrtm.Core.xTests
@@ -15,7 +15,7 @@ namespace NSrtm.Core.xTests
             double yPosition,
             double expectedResult)
         {
-            var spline = Spline3DCalculator.GetBiCubicSpline(values, step);
+            var spline = Spline3DCalculator.GetBicubicSpline(values, step);
             var result = spline.Evaluate( xPosition, yPosition);
             AssertDeep.Equal(result, expectedResult, config => config.DoublePrecision = 1e-1);
         }
