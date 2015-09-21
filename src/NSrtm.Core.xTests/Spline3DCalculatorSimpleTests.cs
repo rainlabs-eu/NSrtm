@@ -10,7 +10,7 @@ namespace NSrtm.Core.xTests
         [Fact]
         public void EmptyValuesContainerThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => Spline3DCalculator.GetBicubicSpline(null, 1));
+            Assert.Throws<ArgumentNullException>(() => BicubicCalculator.GetSpline(null, 1));
         }
 
         [Fact]
@@ -18,7 +18,7 @@ namespace NSrtm.Core.xTests
         {
             Assert.Throws<ArgumentException>(
                                                  () =>
-                                                 Spline3DCalculator.GetBicubicSpline(
+                                                 BicubicCalculator.GetSpline(
                                                                                      new List<List<double>>
                                                                                      {
                                                                                          new List<double> {1, 2, 3, 4},
@@ -33,7 +33,7 @@ namespace NSrtm.Core.xTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(
                                                  () =>
-                                                 Spline3DCalculator.GetBicubicSpline(
+                                                 BicubicCalculator.GetSpline(
                                                                                      new List<List<double>>
                                                                                      {
                                                                                          new List<double> {1, 2, 3, 4},
@@ -48,7 +48,7 @@ namespace NSrtm.Core.xTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(
                                                  () =>
-                                                 Spline3DCalculator.GetBicubicSpline(
+                                                 BicubicCalculator.GetSpline(
                                                                                      new List<List<double>>
                                                                                      {
                                                                                          new List<double> {1, 2, 3, 4},

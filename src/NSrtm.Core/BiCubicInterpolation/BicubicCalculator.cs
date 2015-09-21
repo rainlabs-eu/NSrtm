@@ -5,12 +5,8 @@ using JetBrains.Annotations;
 
 namespace NSrtm.Core.BicubicInterpolation
 {
-    public class Spline3DCalculator
+    public static class BicubicCalculator
     {
-        private Spline3DCalculator()
-        {
-        }
-
         /// <summary>
         ///     Finding derivatives from 2-d function values - https://en.wikipedia.org/wiki/Bicubic_interpolation
         ///     using centered differencing formula (5.4)
@@ -114,13 +110,15 @@ namespace NSrtm.Core.BicubicInterpolation
         /// <param name="values">function values,  (4×4)</param>
         /// <param name="step">Distance between the nodes</param>
         /// <returns>Func with spline interpolant</returns>
-        public static BivariatePolynomial GetBicubicSpline([NotNull] IReadOnlyList<IReadOnlyList<double>> values, double step)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
+            Justification = "This way of passing function values brings less misunderstandings")]
+        public static BivariatePolynomial GetSpline([NotNull] IReadOnlyList<IReadOnlyList<double>> values, double step)
         {
             if (values == null) throw new ArgumentNullException("values");
             if (step <= 0) throw new ArgumentOutOfRangeException("step", "Step must be positive");
             if (values.Count != 4 || values.Any(value => value.Count != 4))
             {
-                throw new ArgumentException("values", "Bicubic interpolation considers 16 elements(4×4)");
+                throw new ArgumentException("Bicubic interpolation considers 16 elements(4×4)", "values");
             }
 
             var x = getParametersDescribingGrid(values, step);

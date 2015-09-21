@@ -15,7 +15,7 @@ namespace NSrtm.Core.xTests
             double yPosition,
             double expectedResult)
         {
-            var spline = Spline3DCalculator.GetBicubicSpline(values, step);
+            var spline = BicubicCalculator.GetSpline(values, step);
             var result = spline.Evaluate( xPosition, yPosition);
             AssertDeep.Equal(result, expectedResult, config => config.DoublePrecision = 1e-1);
         }

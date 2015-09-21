@@ -13,7 +13,7 @@ namespace NSrtm.Core.BicubicInterpolation
         public BivariatePolynomial([NotNull] IReadOnlyList<double> coefficients)
         {
             if (coefficients == null) throw new ArgumentNullException("coefficients");
-            if (coefficients.Count != 16) throw new ArgumentException("coefficients", "Bivariate polynomial use 16 coefficients.");
+            if (coefficients.Count != 16) throw new ArgumentException("Bivariate polynomial use 16 coefficients.", "coefficients");
             _coefficients = coefficients.Select((c, i) => new {Index = i, value = c})
                                         .GroupBy(p => p.Index / 4)
                                         .Select(c => c.Select(v => v.value)
