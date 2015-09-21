@@ -90,7 +90,9 @@
     <Compile Include="Level.cs" />
     <Compile Include="Pgm\DataDesciption\PgmDataDescriptionExtractor.cs" />
     <Compile Include="Pgm\Exceptions\InvalidFileTypeException.cs" />
+    <Compile Include="Pgm\PgmCellCoords.cs" />
     <Compile Include="Pgm\PgmDataConverter.cs" />
+    <Compile Include="Pgm\PgmElevationProvider.cs" />
     <Compile Include="Pgm\PgmGeoidUndulationGridFactory.cs" />
     <Compile Include="Pgm\DataDesciption\PgmDataDescription.cs" />
     <Compile Include="Pgm\GeoidUndulationGrid\PgmGeoidUndulationGridInFile.cs" />
