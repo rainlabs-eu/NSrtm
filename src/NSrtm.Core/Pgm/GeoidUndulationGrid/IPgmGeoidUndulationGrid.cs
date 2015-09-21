@@ -1,6 +1,6 @@
 ﻿namespace NSrtm.Core.Pgm.GeoidUndulationGrid
 {
-    internal interface IPgmGeoidUndulationGrid
+    public interface IPgmGeoidUndulationGrid
     {
         double GetUndulation(double latitude, double longitude);
     }
