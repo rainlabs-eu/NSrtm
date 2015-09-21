@@ -1,6 +1,6 @@
 ﻿namespace NSrtm.Core.Pgm.DataDesciption
 {
-    internal struct PgmDataDescription
+    public struct PgmDataDescription
     {
         private readonly double _offset;
         private readonly double _scale;

@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using NSrtm.Core.BicubicInterpolation;
 using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
 {
-    public sealed class PgmElevationProvider : IElevationProvider
+    public sealed class PgmElevationProvider
     {
-        private IPgmGeoidUndulationGrid _discreteSurface;
-        private ConcurrentDictionary<PgmCellCords, BivariatePolynomial> _continuousSurface = new ConcurrentDictionary<PgmCellCords, BivariatePolynomial>();
-        private Level _elevationBase;
-        private Level _elevationTarget;
+        private readonly IPgmGeoidUndulationGrid _discreteSurface;
+
+        private readonly ConcurrentDictionary<PgmCellCords, BivariatePolynomial> _continuousSurface =
+            new ConcurrentDictionary<PgmCellCords, BivariatePolynomial>();
 
         public PgmElevationProvider([NotNull] IPgmGeoidUndulationGrid discreteSurface)
         {
@@ -22,16 +21,14 @@ namespace NSrtm.Core.Pgm
 
         public double GetElevation(double latitude, double longitude)
         {
-        ???
+            var mainNode = PgmCellCoordsExtensions.FromLatLon(latitude, longitude, _discreteSurface.PgmParameters);
+            var interpolatedCell = _continuousSurface.GetOrAdd(mainNode, interpolateCellSurface);
+            return interpolatedCell.Evaluate(latitude, longitude);
         }
 
-        public Task<double> GetElevationAsync(double latitude, double longitude)
+        private BivariatePolynomial interpolateCellSurface(PgmCellCords pgmCellCords)
         {
-        ???
+            throw new NotImplementedException();
         }
-
-        public Level ElevationBase { get { return _elevationBase; } }
-
-        public Level ElevationTarget { get { return _elevationTarget; } }
     }
 }
