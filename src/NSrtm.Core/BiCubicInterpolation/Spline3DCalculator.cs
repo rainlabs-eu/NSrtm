@@ -81,19 +81,6 @@ namespace NSrtm.Core.BiCubicInterpolation
             return x;
         }
 
-        private static double getFromPoly(List<double> coefficients, double xPos, double yPos)
-        {
-            double result = 0;
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    result += coefficients[i * 4 + j] * Math.Pow(xPos, j) * Math.Pow(yPos, i);
-                }
-            }
-            return result;
-        }
-
         #region Static Members
 
         private static readonly int[,] _linearEquationCoefficients =
@@ -124,7 +111,7 @@ namespace NSrtm.Core.BiCubicInterpolation
         /// <param name="values">function values,  (4×4)</param>
         /// <param name="step">Distance between the nodes</param>
         /// <returns>Func with spline interpolant</returns>
-        public static Func<double, double, double> GetBiCubicSpline([NotNull] IReadOnlyList<IReadOnlyList<double>> values, double step)
+        public static BivariatePolynomial GetBiCubicSpline([NotNull] IReadOnlyList<IReadOnlyList<double>> values, double step)
         {
             if (values == null) throw new ArgumentNullException("values");
             if (step <= 0) throw new ArgumentOutOfRangeException("step", "Step must be positive");
@@ -137,7 +124,7 @@ namespace NSrtm.Core.BiCubicInterpolation
 
             var coefficients = getCoefficients(x);
 
-            return ((xPos, yPos) => getFromPoly(coefficients, xPos, yPos));
+            return new BivariatePolynomial(coefficients);
         }
 
         #endregion
