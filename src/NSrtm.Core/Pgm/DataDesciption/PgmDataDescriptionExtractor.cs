@@ -18,6 +18,7 @@ namespace NSrtm.Core.Pgm.DataDesciption
                 {"Scale", new Regex(@"^#[\s]Scale[\s]+(?<scale>.+)$", RegexOptions.Multiline)},
                 {"Origin", new Regex(@"^#[\s]Origin[\s](?<lat>\d+)(?<latPos>[NS])\s(?<lon>\d+)(?<lonPos>[EW])", RegexOptions.Multiline)},
                 {"PointParameters", new Regex(@"(\n|\r|\r\n)(?<width>\d+)\s+(?<height>\d+)(\n|\r|\r\n)(?<maxValue>\d+)", RegexOptions.Multiline)},
+                {"Level", new Regex(@"^#.+EGM(?<level>\d+)", RegexOptions.Multiline)},
             };
     }
 
@@ -65,11 +66,12 @@ namespace NSrtm.Core.Pgm.DataDesciption
             var width = Int32.Parse(matches["PointParameters"].Groups["width"].Value);
             var height = Int32.Parse(matches["PointParameters"].Groups["height"].Value);
             var maxValue = Int32.Parse(matches["PointParameters"].Groups["maxValue"].Value);
+            var level = LevelExtensions.Parse(matches["Level"].Groups["level"].Value);
 
             var lat = matches["Origin"].Groups["latPos"].Value == "N" ? latAngle : -latAngle;
             var lon = matches["Origin"].Groups["lonPos"].Value == "E" ? lonAngle : lonAngle + 180;
 
-            return new PgmDataDescription(offset, scale, lat, lon, width, height, maxValue, preamble.Length);
+            return new PgmDataDescription(offset, scale, lat, lon, width, height, maxValue, preamble.Length, level);
         }
     }
 
