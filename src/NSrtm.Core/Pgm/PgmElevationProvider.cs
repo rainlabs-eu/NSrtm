@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using JetBrains.Annotations;
 using NSrtm.Core.BicubicInterpolation;
+using NSrtm.Core.Pgm.DataDesciption;
 using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
@@ -20,48 +21,49 @@ namespace NSrtm.Core.Pgm
             _discreteSurface = discreteSurface;
         }
 
-        internal BivariatePolynomial interpolateCellSurface(PgmCellCoords pgmCellCoords)
+        private PgmDataDescription dataDescription { get { return _discreteSurface.PgmParameters; } }
+
+        internal BivariatePolynomial getInterpolatioForCellSurface(PgmCellCoords pgmCellCoords)
         {
-            var latitudes = Enumerable.Range(-1, 4)
-                                      .Select(step => pgmCellCoords.Lon + step * _discreteSurface.PgmParameters.LongitudeIncrementDegrees);
-            var longitudes = Enumerable.Range(-1, 4)
-                                       .Select(step => pgmCellCoords.Lat + step * _discreteSurface.PgmParameters.LatitudeIncrementDegrees);
-            var coordinates = latitudes.SelectMany(lat => longitudes.Select(lon => normalizeCoords(lat,lon))).ToList();
-            var data = coordinates.Select(coor => _discreteSurface.GetUndulation(coor.Lat, coor.Lon));
-            var dataFormated = data.Select((c, i) => new { Index = i, value = c })
-                            .GroupBy(p => p.Index / 4)
-                            .Select(c => c.Select(v => v.value)
-                                          .ToList())
-                            .ToList();
-            var spline = BicubicCalculator.GetSpline(dataFormated, _discreteSurface.PgmParameters.LatitudeIncrementDegrees);
-            return spline;
+            var horizontalNodes = Enumerable.Range(-1, 4)
+                                            .Select(step => pgmCellCoords.Lon + step * dataDescription.LongitudeIncrementDegrees);
+            var verticalNodes = Enumerable.Range(-1, 4)
+                                          .Select(step => pgmCellCoords.Lat + step * dataDescription.LatitudeIncrementDegrees);
+            var nodesCoordinates = horizontalNodes.SelectMany(lat => verticalNodes.Select(lon => normalizeCoords(lat, lon)))
+                                                  .ToList();
+            var nodesUndulations = nodesCoordinates.Select(coor => _discreteSurface.GetUndulation(coor.Lat, coor.Lon));
+            var formattedUndulations = nodesUndulations.Select((c, i) => new {Index = i, value = c})
+                                                       .GroupBy(p => p.Index / 4)
+                                                       .Select(c => c.Select(v => v.value)
+                                                                     .ToList())
+                                                       .ToList();
+            return BicubicCalculator.GetSpline(values: formattedUndulations, step: dataDescription.LatitudeIncrementDegrees);
         }
 
         private static PgmCellCoords normalizeCoords(double lat, double lon)
         {
-            var pushedLon = lon;
+            var normalizedLongitude = lon;
             if (lat > 90 || lat < -90)
             {
-                pushedLon += 180;
+                normalizedLongitude += 180;
             }
-            return new PgmCellCoords(normalizeLatitude(lat), normalizeLongitude(pushedLon));
+            normalizedLongitude = (360 + (normalizedLongitude % 360)) % 360;
+            var normalizedLatitude = Math.Atan(Math.Sin(lat) / Math.Abs(Math.Cos(lat)));
+            return new PgmCellCoords(normalizedLatitude, normalizedLongitude);
         }
 
-        private static double normalizeLongitude(double lon)
-        {
-            return (360 + (lon % 360)) % 360;
-        }
-
-        private static double normalizeLatitude(double lat)
-        {
-            return Math.Atan(Math.Sin(lat) / Math.Abs(Math.Cos(lat)));
-        }
-
+        /// <summary>
+        ///     Gets elevation of the geoid above the ellipsoid.
+        /// </summary>
+        /// <param name="latitude">Latitude in degrees in WGS84 datum</param>
+        /// <param name="longitude">Longitude in degrees in WGS84 datum</param>
+        /// <returns></returns>
         public double GetElevation(double latitude, double longitude)
         {
-            var mainNode = PgmCellCoordsExtensions.FromLatLon(latitude, longitude, _discreteSurface.PgmParameters);
-            var interpolatedCell = _continuousSurface.GetOrAdd(mainNode, interpolateCellSurface);
-            return interpolatedCell.Evaluate(latitude, longitude);
+            var longitudeEgmDatum = longitude + 180;
+            var mainNode = PgmCellCoords.ForCoordinatesUsingDescription(latitude, longitudeEgmDatum, _discreteSurface.PgmParameters);
+            var interpolatedCell = _continuousSurface.GetOrAdd(mainNode, getInterpolatioForCellSurface);
+            return interpolatedCell.Evaluate(latitude, longitudeEgmDatum);
         }
 
         public Level ElevationBase { get { return _discreteSurface.PgmParameters.Level; } }

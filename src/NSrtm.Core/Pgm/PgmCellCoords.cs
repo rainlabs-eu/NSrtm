@@ -46,17 +46,14 @@ namespace NSrtm.Core.Pgm
         {
             return !left.Equals(right);
         }
-    }
 
-    internal static class PgmCellCoordsExtensions
-    {
-        public static PgmCellCoords FromLatLon(double latitude, double longitude, PgmDataDescription dataDescription)
+        public static PgmCellCoords ForCoordinatesUsingDescription(double latitude, double longitude, PgmDataDescription dataDescription)
         {
-            var mainNodeLat = Math.Floor(dataDescription.OriginLat - latitude / dataDescription.LatitudeIncrementDegrees) *
-                              dataDescription.LatitudeIncrementDegrees;
-            var mainNodeLot = Math.Floor(dataDescription.OriginLon - longitude / dataDescription.LongitudeIncrementDegrees) *
-                              dataDescription.LongitudeIncrementDegrees;
-            return new PgmCellCoords(mainNodeLat, mainNodeLot);
+            var verticalPositonSteps = dataDescription.OriginLat - latitude / dataDescription.LatitudeIncrementDegrees;
+            var nodeVerticalPosition = Math.Floor(verticalPositonSteps) * dataDescription.LatitudeIncrementDegrees;
+            var horizontalPositionSteps = dataDescription.OriginLon - longitude / dataDescription.LongitudeIncrementDegrees;
+            var nodeHorizontalPosition = Math.Floor(horizontalPositionSteps) * dataDescription.LongitudeIncrementDegrees;
+            return new PgmCellCoords(nodeVerticalPosition, nodeHorizontalPosition);
         }
     }
 }
