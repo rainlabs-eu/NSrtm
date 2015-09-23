@@ -50,7 +50,6 @@
         public int PreambleLength { get { return _preambleLength; } }
         public double LatitudeIncrementDegrees { get { return _latitudeIncrementDegrees; } }
         public double LongitudeIncrementDegrees { get { return _longitudeIncrementDegrees; } }
-
-        public Level Level1 { get { return _level; } }
+        public Level Level { get { return _level; } }
     }
 }

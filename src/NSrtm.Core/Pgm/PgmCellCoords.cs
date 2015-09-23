@@ -4,12 +4,12 @@ using NSrtm.Core.Pgm.DataDesciption;
 
 namespace NSrtm.Core.Pgm
 {
-    internal struct PgmCellCords : IEquatable<PgmCellCords>
+    internal struct PgmCellCoords : IEquatable<PgmCellCoords>
     {
         private readonly double _lat;
         private readonly double _lon;
 
-        public PgmCellCords(double lat, double lon)
+        public PgmCellCoords(double lat, double lon)
         {
             _lat = lat;
             _lon = lon;
@@ -18,7 +18,7 @@ namespace NSrtm.Core.Pgm
         public double Lat { get { return _lat; } }
         public double Lon { get { return _lon; } }
 
-        public bool Equals(PgmCellCords other)
+        public bool Equals(PgmCellCoords other)
         {
             return _lat.Equals(other._lat) && _lon.Equals(other._lon);
         }
@@ -26,7 +26,7 @@ namespace NSrtm.Core.Pgm
         public override bool Equals([CanBeNull] object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
-            return obj is PgmCellCords && Equals((PgmCellCords)obj);
+            return obj is PgmCellCoords && Equals((PgmCellCoords)obj);
         }
 
         public override int GetHashCode()
@@ -37,12 +37,12 @@ namespace NSrtm.Core.Pgm
             }
         }
 
-        public static bool operator ==(PgmCellCords left, PgmCellCords right)
+        public static bool operator ==(PgmCellCoords left, PgmCellCoords right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(PgmCellCords left, PgmCellCords right)
+        public static bool operator !=(PgmCellCoords left, PgmCellCoords right)
         {
             return !left.Equals(right);
         }
@@ -50,13 +50,13 @@ namespace NSrtm.Core.Pgm
 
     internal static class PgmCellCoordsExtensions
     {
-        public static PgmCellCords FromLatLon(double latitude, double longitude, PgmDataDescription dataDescription)
+        public static PgmCellCoords FromLatLon(double latitude, double longitude, PgmDataDescription dataDescription)
         {
             var mainNodeLat = Math.Floor(dataDescription.OriginLat - latitude / dataDescription.LatitudeIncrementDegrees) *
                               dataDescription.LatitudeIncrementDegrees;
             var mainNodeLot = Math.Floor(dataDescription.OriginLon - longitude / dataDescription.LongitudeIncrementDegrees) *
                               dataDescription.LongitudeIncrementDegrees;
-            return new PgmCellCords(mainNodeLat, mainNodeLot);
+            return new PgmCellCoords(mainNodeLat, mainNodeLot);
         }
     }
 }
