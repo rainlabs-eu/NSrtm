@@ -78,6 +78,7 @@
     </Compile>
     <Compile Include="AssertDeep.cs" />
     <Compile Include="PgmDataDescriptionExtractorTests.cs" />
+    <Compile Include="PgmElevationProviderCoordinatesFindingTests.cs" />
     <Compile Include="PgmPreamblesHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Spline3DCalculatorSimpleTests.cs" />
