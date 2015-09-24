@@ -49,10 +49,8 @@ namespace NSrtm.Core.Pgm
 
         public static PgmCellCoords ForCoordinatesUsingDescription(double latitude, double longitude, PgmDataDescription dataDescription)
         {
-            var verticalPositonSteps = dataDescription.OriginLat - latitude / dataDescription.LatitudeIncrementDegrees;
-            var nodeVerticalPosition = Math.Floor(verticalPositonSteps) * dataDescription.LatitudeIncrementDegrees;
-            var horizontalPositionSteps = dataDescription.OriginLon - longitude / dataDescription.LongitudeIncrementDegrees;
-            var nodeHorizontalPosition = Math.Floor(horizontalPositionSteps) * dataDescription.LongitudeIncrementDegrees;
+            var nodeVerticalPosition = Math.Floor(latitude / dataDescription.LatitudeIncrementDegrees) * dataDescription.LatitudeIncrementDegrees;
+            var nodeHorizontalPosition = Math.Floor(longitude / dataDescription.LongitudeIncrementDegrees) * dataDescription.LongitudeIncrementDegrees;
             return new PgmCellCoords(nodeVerticalPosition, nodeHorizontalPosition);
         }
     }

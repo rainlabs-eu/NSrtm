@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using NSrtm.Core.BicubicInterpolation;
@@ -23,14 +24,11 @@ namespace NSrtm.Core.Pgm
 
         private PgmDataDescription dataDescription { get { return _discreteSurface.PgmParameters; } }
 
-        internal BivariatePolynomial getInterpolatioForCellSurface(PgmCellCoords pgmCellCoords)
+        private BivariatePolynomial getInterpolatioForCellSurface(PgmCellCoords pgmCellCoords)
         {
-            var horizontalNodes = Enumerable.Range(-1, 4)
-                                            .Select(step => pgmCellCoords.Lon + step * dataDescription.LongitudeIncrementDegrees);
-            var verticalNodes = Enumerable.Range(-1, 4)
-                                          .Select(step => pgmCellCoords.Lat + step * dataDescription.LatitudeIncrementDegrees);
-            var nodesCoordinates = horizontalNodes.SelectMany(lat => verticalNodes.Select(lon => normalizeCoords(lat, lon)))
-                                                  .ToList();
+            var nodesCoordinates = findCellAndSurroundingNodesCoords(pgmCellCoords,
+                                                                     dataDescription.LatitudeIncrementDegrees,
+                                                                     dataDescription.LongitudeIncrementDegrees);
             var nodesUndulations = nodesCoordinates.Select(coor => _discreteSurface.GetUndulation(coor.Lat, coor.Lon));
             var formattedUndulations = nodesUndulations.Select((c, i) => new {Index = i, value = c})
                                                        .GroupBy(p => p.Index / 4)
@@ -48,7 +46,8 @@ namespace NSrtm.Core.Pgm
                 normalizedLongitude += 180;
             }
             normalizedLongitude = (360 + (normalizedLongitude % 360)) % 360;
-            var normalizedLatitude = Math.Atan(Math.Sin(lat) / Math.Abs(Math.Cos(lat)));
+            var absoluteLat = Math.Abs(Math.Abs(lat % 180) - 90);
+            var normalizedLatitude = lat > 0 ? 90 - absoluteLat : absoluteLat - 90;
             return new PgmCellCoords(normalizedLatitude, normalizedLongitude);
         }
 
@@ -68,5 +67,19 @@ namespace NSrtm.Core.Pgm
 
         public Level ElevationBase { get { return _discreteSurface.PgmParameters.Level; } }
         public Level ElevationTarget { get { return Level.EllipsoidWgs84; } }
+
+        #region Static Members
+
+        internal static IEnumerable<PgmCellCoords> findCellAndSurroundingNodesCoords(PgmCellCoords pgmCellCoords, double latIncrement, double lonIncrement)
+        {
+            var horizontalNodes = Enumerable.Range(-1, 4)
+                                            .Select(step => pgmCellCoords.Lon + step * lonIncrement);
+            var verticalNodes = Enumerable.Range(-1, 4)
+                                          .Select(step => pgmCellCoords.Lat + step * latIncrement);
+            return verticalNodes.SelectMany(lat => horizontalNodes.Select(lon => normalizeCoords(lat, lon)))
+                                  .ToList();
+        }
+
+        #endregion
     }
 }
