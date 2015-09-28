@@ -49,8 +49,12 @@ namespace NSrtm.Core.BicubicInterpolation
         {
             public static double UseHornerScheme(this IEnumerable<double> coefficients, double variable)
             {
-                return coefficients.Aggregate(
-                                              (accumulator, coefficient) => accumulator * variable + coefficient);
+                double result = 0;
+                foreach (var coefficient in coefficients)
+                {
+                    result = result * variable + coefficient;
+                }
+                return result;
             }
         }
     }
