@@ -36,7 +36,7 @@ namespace NSrtm.Core.BicubicInterpolation
         }
     }
 
-    internal static class HornersSchame
+    internal static class HornersScheme
     {
         public static double UseHornerScheme(this IEnumerable<double> coefficients, double variable)
         {
