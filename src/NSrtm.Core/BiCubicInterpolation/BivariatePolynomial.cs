@@ -30,13 +30,17 @@ namespace NSrtm.Core.BicubicInterpolation
 
         public double Evaluate(double x, double y)
         {
-            return _reversedCoefficients.Select(coeff => coeff.UseHornerScheme(y))
-                                .ToList()
-                                .UseHornerScheme(x);
+            var hornersResultsTermsY = new List<double>();
+            foreach (var revCoeffVector in _reversedCoefficients)
+            {
+                   hornersResultsTermsY.Add(revCoeffVector.UseHornerScheme(y));
+            }
+            var hornerResultTermsX = hornersResultsTermsY.UseHornerScheme(x);
+            return hornerResultTermsX;
         }
     }
 
-    internal static class HornersScheme
+    internal static class HornersSchame
     {
         public static double UseHornerScheme(this IEnumerable<double> coefficients, double variable)
         {
