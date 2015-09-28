@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using NSrtm.Core.BicubicInterpolation;
 using NSrtm.Core.Pgm.DataDesciption;
@@ -9,7 +10,7 @@ using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
 {
-    internal sealed class PgmElevationProvider
+    internal sealed class PgmElevationProvider : IElevationProvider
     {
         private readonly IPgmGeoidUndulationGrid _discreteSurface;
 
@@ -24,7 +25,7 @@ namespace NSrtm.Core.Pgm
 
         private PgmDataDescription dataDescription { get { return _discreteSurface.PgmParameters; } }
 
-        private BivariatePolynomial getInterpolatioForCellSurface(PgmCellCoords pgmCellCoords)
+        private BivariatePolynomial getInterpolationForCellSurface(PgmCellCoords pgmCellCoords)
         {
             var nodesCoordinates = findCellAndSurroundingNodesCoords(pgmCellCoords,
                                                                      dataDescription.LatitudeIncrementDegrees,
@@ -61,8 +62,13 @@ namespace NSrtm.Core.Pgm
         {
             var longitudeEgmDatum = longitude + 180;
             var mainNode = PgmCellCoords.ForCoordinatesUsingDescription(latitude, longitudeEgmDatum, dataDescription);
-            var interpolatedCell = _continuousSurface.GetOrAdd(mainNode, getInterpolatioForCellSurface);
+            var interpolatedCell = _continuousSurface.GetOrAdd(mainNode, getInterpolationForCellSurface);
             return interpolatedCell.Evaluate(latitude, longitudeEgmDatum);
+        }
+
+        public Task<double> GetElevationAsync(double latitude, double longitude)
+        {
+            return Task.FromResult(GetElevation(latitude, longitude));
         }
 
         public Level ElevationBase { get { return dataDescription.Level; } }
@@ -77,8 +83,12 @@ namespace NSrtm.Core.Pgm
             var verticalNodes = Enumerable.Range(-1, 4)
                                           .Select(step => pgmCellCoords.Lat + step * latIncrement);
             return verticalNodes.SelectMany(lat => horizontalNodes.Select(lon => normalizeCoords(lat, lon)))
-                                  .ToList();
+                                .ToList();
         }
+
+        #endregion
+
+        #region Provider creation
 
         /// <summary>
         ///     Creates elevation provider which loads PGM file to memory and uses bicubic spline interpolation.
@@ -104,6 +114,6 @@ namespace NSrtm.Core.Pgm
             return new PgmElevationProvider(pgmGeoidUndulationFile);
         }
 
-        #endregion
+        #endregion Provider creation
     }
 }
