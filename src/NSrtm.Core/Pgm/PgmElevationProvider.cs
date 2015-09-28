@@ -9,7 +9,7 @@ using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
 {
-    public sealed class PgmElevationProvider
+    internal sealed class PgmElevationProvider
     {
         private readonly IPgmGeoidUndulationGrid _discreteSurface;
 
@@ -60,12 +60,12 @@ namespace NSrtm.Core.Pgm
         public double GetElevation(double latitude, double longitude)
         {
             var longitudeEgmDatum = longitude + 180;
-            var mainNode = PgmCellCoords.ForCoordinatesUsingDescription(latitude, longitudeEgmDatum, _discreteSurface.PgmParameters);
+            var mainNode = PgmCellCoords.ForCoordinatesUsingDescription(latitude, longitudeEgmDatum, dataDescription);
             var interpolatedCell = _continuousSurface.GetOrAdd(mainNode, getInterpolatioForCellSurface);
             return interpolatedCell.Evaluate(latitude, longitudeEgmDatum);
         }
 
-        public Level ElevationBase { get { return _discreteSurface.PgmParameters.Level; } }
+        public Level ElevationBase { get { return dataDescription.Level; } }
         public Level ElevationTarget { get { return Level.EllipsoidWgs84; } }
 
         #region Static Members
@@ -78,6 +78,30 @@ namespace NSrtm.Core.Pgm
                                           .Select(step => pgmCellCoords.Lat + step * latIncrement);
             return verticalNodes.SelectMany(lat => horizontalNodes.Select(lon => normalizeCoords(lat, lon)))
                                   .ToList();
+        }
+
+        /// <summary>
+        ///     Creates elevation provider which loads PGM file to memory and uses bicubic spline interpolation.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>Created provider.</returns>
+        [NotNull]
+        public static IElevationProvider CreateWithStoredGridInMemory([NotNull] string path)
+        {
+            var pgmGeoidUndulationMemory = PgmGeoidUndulationGridFactory.CreateGeoidUndulationGridInMemory(path);
+            return new PgmElevationProvider(pgmGeoidUndulationMemory);
+        }
+
+        /// <summary>
+        ///     Creates elevation provider which reads PGM data from file.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>Created provider.</returns>
+        [NotNull]
+        public static IElevationProvider CreateDirectAccessToGrid([NotNull] string path)
+        {
+            var pgmGeoidUndulationFile = PgmGeoidUndulationGridFactory.CreateGeoidUndulationGridInFile(path);
+            return new PgmElevationProvider(pgmGeoidUndulationFile);
         }
 
         #endregion
