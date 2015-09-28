@@ -33,10 +33,10 @@ namespace NSrtm.Core.BicubicInterpolation
 
         public double Evaluate(double x, double y)
         {
-            var hornersResultsTermsY = new List<double>();
-            foreach (var revCoeffVector in _reversedCoefficients)
+            var hornersResultsTermsY = new double[4];
+            for (int i = 0; i < 4; i++)
             {
-                hornersResultsTermsY.Add(revCoeffVector.UseHornerScheme(y));
+                hornersResultsTermsY[i] = _reversedCoefficients[i].UseHornerScheme(y);
             }
             var hornerResultTermsX = hornersResultsTermsY.UseHornerScheme(x);
             return hornerResultTermsX;
@@ -47,8 +47,12 @@ namespace NSrtm.Core.BicubicInterpolation
     {
         public static double UseHornerScheme(this IEnumerable<double> coefficients, double variable)
         {
-            return coefficients.Aggregate(
-                                          (accumulator, coefficient) => accumulator * variable + coefficient);
+            double result = 0;
+            foreach (var coefficient in coefficients)
+            {
+                result = result * variable + coefficient;
+            }
+            return result;
         }
     }
 }
