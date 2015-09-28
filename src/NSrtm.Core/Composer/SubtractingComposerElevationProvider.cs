@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
@@ -16,8 +17,10 @@ namespace NSrtm.Core
         /// </summary>
         /// <param name="providerPositive">Provider with + sign (C over A)</param>
         /// <param name="providerNegative">Provider with - sign (B over A)</param>
-        public SubtractingComposerElevationProvider(IElevationProvider providerPositive, IElevationProvider providerNegative)
+        public SubtractingComposerElevationProvider([NotNull] IElevationProvider providerPositive, [NotNull] IElevationProvider providerNegative)
         {
+            if (providerPositive == null) throw new ArgumentNullException("providerPositive");
+            if (providerNegative == null) throw new ArgumentNullException("providerNegative");
             if (providerPositive.ElevationBase != providerNegative.ElevationBase)
                 throw new ArgumentException(string.Format("Base must be common for both providers, called with:" +
                                                           "providerPositive.ElevationBase == {0} and " +

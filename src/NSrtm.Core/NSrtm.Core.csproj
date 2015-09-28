@@ -65,6 +65,8 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BicubicInterpolation\BivariatePolynomial.cs" />
+    <Compile Include="BicubicInterpolation\BicubicCalculator.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInFileFactory.cs" />
     <Compile Include="Hgt\Loaders\HgtDataLoaderFromFileStreamBase.cs" />
     <Compile Include="Hgt\Utils\HgtCellCoords.cs" />
