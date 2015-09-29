@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace NSrtm.Core
 {
@@ -25,12 +24,12 @@ namespace NSrtm.Core
         Task<double> GetElevationAsync(double latitude, double longitude);
 
         /// <summary>
-        /// Base level (for this level elevation provider returns zero)
+        ///     Base level (for this level elevation provider returns zero)
         /// </summary>
         Level ElevationBase { get; }
 
         /// <summary>
-        /// Target Level - this level measured relatively to Base is returned
+        ///     Target Level - this level measured relatively to Base is returned
         /// </summary>
         Level ElevationTarget { get; }
     }

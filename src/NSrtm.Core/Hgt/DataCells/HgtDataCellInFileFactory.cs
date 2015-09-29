@@ -15,7 +15,7 @@ namespace NSrtm.Core
             _pathResolver = pathResolver;
         }
 
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",Justification = "Returned cell is disposable")]
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Returned cell is disposable")]
         public IHgtDataCell GetCellFor(HgtCellCoords coords)
         {
             var path = _pathResolver.FindFilePath(coords);
@@ -44,17 +44,13 @@ namespace NSrtm.Core
             private readonly FileStream _file;
             private readonly object _lock = new object();
 
-            internal HgtDataCellInFile([NotNull] FileStream file, int fileSize, HgtCellCoords coords) : base(fileSize, coords)
+            internal HgtDataCellInFile([NotNull] FileStream file, int fileSize, HgtCellCoords coords)
+                : base(fileSize, coords)
             {
                 _file = file;
             }
 
             public override long MemorySize { get { return 0; } }
-
-            public void Dispose()
-            {
-                _file.Dispose();
-            }
 
             public override Task<double> GetElevationAsync(double latitude, double longitude)
             {
@@ -71,6 +67,11 @@ namespace NSrtm.Core
                         return elevation;
                     else return Double.NaN;
                 }
+            }
+
+            public void Dispose()
+            {
+                _file.Dispose();
             }
         }
     }

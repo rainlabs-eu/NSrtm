@@ -14,14 +14,6 @@ namespace NSrtm.Core
         private readonly IHgtDataCellFactory _cellFactory;
         private readonly ConcurrentDictionary<HgtCellCoords, IHgtDataCell> _cache = new ConcurrentDictionary<HgtCellCoords, IHgtDataCell>();
 
-        internal HgtElevationProvider([NotNull] IHgtDataCellFactory cellFactory)
-        {
-            if (cellFactory == null) throw new ArgumentNullException("cellFactory");
-            _cellFactory = cellFactory;
-            Name = "Unknown";
-            Description = "Unknown";
-        }
-
         /// <summary>
         ///     Short name describing implementation. Used for UI/Demos where different implementations are available.
         /// </summary>
@@ -34,42 +26,13 @@ namespace NSrtm.Core
         [NotNull]
         public string Description { get; set; }
 
-        /// <summary>
-        ///     Gets elevation above MSL
-        /// </summary>
-        /// <param name="latitude">Latitude in degrees in WGS84 datum</param>
-        /// <param name="longitude">Longitude in degrees in WGS84 datum</param>
-        /// <returns></returns>
-        public double GetElevation(double latitude, double longitude)
+        internal HgtElevationProvider([NotNull] IHgtDataCellFactory cellFactory)
         {
-            var coords = HgtCellCoords.ForLatLon(latitude, longitude);
-
-            var cell = _cache.GetOrAdd(coords, buildCellFor);
-
-            return cell.GetElevation(latitude, longitude);
+            if (cellFactory == null) throw new ArgumentNullException("cellFactory");
+            _cellFactory = cellFactory;
+            Name = "Unknown";
+            Description = "Unknown";
         }
-
-        /// <summary>
-        ///     Gets elevation above MSL
-        /// </summary>
-        /// <param name="latitude"></param>
-        /// <param name="longitude"></param>
-        /// <returns></returns>
-        public Task<double> GetElevationAsync(double latitude, double longitude)
-        {
-            var coords = HgtCellCoords.ForLatLon(latitude, longitude);
-            IHgtDataCell cellFromCache;
-            if (_cache.TryGetValue(coords, out cellFromCache))
-            {
-                cellFromCache.GetElevationAsync(latitude, longitude);
-            }
-
-            return buildAndCacheCellAndReturnElevationAsync(coords, latitude, longitude);
-        }
-
-        public Level ElevationBase { get { return Level.EllipsoidWgs84; } }
-
-        public Level ElevationTarget { get { return Level.Terrain; } }
 
         private async Task<double> buildAndCacheCellAndReturnElevationAsync(HgtCellCoords coords, double latitude, double longitude)
         {
@@ -100,6 +63,46 @@ namespace NSrtm.Core
                 return HgtDataCellInvalid.Invalid;
             }
         }
+
+        /// <summary>
+        ///     Gets elevation above MSL
+        /// </summary>
+        /// <param name="latitude">Latitude in degrees in WGS84 datum</param>
+        /// <param name="longitude">Longitude in degrees in WGS84 datum</param>
+        /// <returns></returns>
+        public double GetElevation(double latitude, double longitude)
+        {
+            var coords = HgtCellCoords.ForLatLon(latitude, longitude);
+
+            var cell = _cache.GetOrAdd(coords, buildCellFor);
+
+            return cell.GetElevation(latitude, longitude);
+        }
+
+        /// <summary>
+        ///     Gets elevation above MSL
+        /// </summary>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <returns></returns>
+        public Task<double> GetElevationAsync(double latitude, double longitude)
+        {
+            var coords = HgtCellCoords.ForLatLon(latitude, longitude);
+            IHgtDataCell cellFromCache;
+
+            if (_cache.TryGetValue(coords, out cellFromCache))
+            {
+                return cellFromCache.GetElevationAsync(latitude, longitude);
+            }
+
+            return buildAndCacheCellAndReturnElevationAsync(coords, latitude, longitude);
+        }
+
+        public Level ElevationBase { get { return Level.EllipsoidWgs84; } }
+
+        public Level ElevationTarget { get { return Level.Terrain; } }
+
+        #region Static Members
 
         /// <summary>
         ///     Creates elevation provider which loads HGT files to memory on demand.
@@ -153,5 +156,7 @@ namespace NSrtm.Core
                        Description = string.Format("Memory mapped SRTM files (HGT) from directory {0}", directory)
                    };
         }
+
+        #endregion
     }
 }

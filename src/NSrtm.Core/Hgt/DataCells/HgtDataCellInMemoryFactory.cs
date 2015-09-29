@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -31,7 +30,8 @@ namespace NSrtm.Core
         {
             private readonly byte[] _hgtData;
 
-            internal HgtDataCellInMemory([NotNull] byte[] hgtData, int pointsPerCell, HgtCellCoords coords) : base(pointsPerCell, coords)
+            internal HgtDataCellInMemory([NotNull] byte[] hgtData, int pointsPerCell, HgtCellCoords coords)
+                : base(pointsPerCell, coords)
             {
                 _hgtData = hgtData;
             }

@@ -10,10 +10,8 @@ namespace NSrtm.Core
         private readonly IElevationProvider _providerNegative;
 
         /// <summary>
-        /// Supports composing two elevations providers, one with positive sign and one with negative.
-        /// 
-        /// Common use case is using C over A and B over A providers composed into C over B
-        /// 
+        ///     Supports composing two elevations providers, one with positive sign and one with negative.
+        ///     Common use case is using C over A and B over A providers composed into C over B
         /// </summary>
         /// <param name="providerPositive">Provider with + sign (C over A)</param>
         /// <param name="providerNegative">Provider with - sign (B over A)</param>

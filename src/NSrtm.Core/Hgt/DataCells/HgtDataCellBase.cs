@@ -14,6 +14,8 @@ namespace NSrtm.Core
             _coords = coords;
         }
 
+        protected abstract double ElevationAtOffset(int bytesPos);
+
         public double GetElevation(double latitude, double longitude)
         {
             int localLat = (int)((latitude - _coords.Lat) * _pointsPerCell);
@@ -28,6 +30,5 @@ namespace NSrtm.Core
 
         public abstract long MemorySize { get; }
         public abstract Task<double> GetElevationAsync(double latitude, double longitude);
-        protected abstract double ElevationAtOffset(int bytesPos);
     }
 }

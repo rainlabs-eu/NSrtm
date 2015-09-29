@@ -4,7 +4,8 @@ namespace NSrtm.Core
 {
     internal class HgtPathResolverZip : HgtPathResolverCaching
     {
-        public HgtPathResolverZip([NotNull] string directory) : base(directory)
+        public HgtPathResolverZip([NotNull] string directory)
+            : base(directory)
         {
         }
 

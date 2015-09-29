@@ -23,7 +23,8 @@
             int gridGraphWidthPoints,
             int gridGraphHeightPoints,
             int maxValue,
-            int preambleLength, Level level)
+            int preambleLength,
+            Level level)
         {
             _offset = offset;
             _scale = scale;
