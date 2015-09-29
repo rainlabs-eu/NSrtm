@@ -1,4 +1,3 @@
-using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +7,8 @@ namespace NSrtm.Core
 {
     internal sealed class HgtDataLoaderFromZip : HgtDataLoaderFromFileStreamBase
     {
-        public HgtDataLoaderFromZip([NotNull] IHgtPathResolver pathResolver) : base(pathResolver)
+        public HgtDataLoaderFromZip([NotNull] IHgtPathResolver pathResolver)
+            : base(pathResolver)
         {
         }
 

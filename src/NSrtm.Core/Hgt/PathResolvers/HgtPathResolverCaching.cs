@@ -15,11 +15,6 @@ namespace NSrtm.Core
             _directory = directory;
         }
 
-        public string FindFilePath(HgtCellCoords coords)
-        {
-            return _cache.GetOrAdd(coords, findPathForFile);
-        }
-
         [NotNull]
         private string findPathForFile(HgtCellCoords coords)
         {
@@ -38,12 +33,17 @@ namespace NSrtm.Core
             if (path != null) return path;
 
             var foundfile = new DirectoryInfo(_directory).EnumerateFiles(filename, SearchOption.AllDirectories)
-                                                        .FirstOrDefault();
+                                                         .FirstOrDefault();
             if (foundfile != null) return foundfile.FullName;
             else throw new HgtFileNotFoundException(coords);
         }
 
         [NotNull]
         protected abstract string coordsToFilename(HgtCellCoords coords);
+
+        public string FindFilePath(HgtCellCoords coords)
+        {
+            return _cache.GetOrAdd(coords, findPathForFile);
+        }
     }
 }

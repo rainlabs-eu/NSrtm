@@ -14,14 +14,6 @@ namespace NSrtm.Core
         private readonly IHgtDataCellFactory _cellFactory;
         private readonly ConcurrentDictionary<HgtCellCoords, IHgtDataCell> _cache = new ConcurrentDictionary<HgtCellCoords, IHgtDataCell>();
 
-        internal HgtElevationProvider([NotNull] IHgtDataCellFactory cellFactory)
-        {
-            if (cellFactory == null) throw new ArgumentNullException("cellFactory");
-            _cellFactory = cellFactory;
-            Name = "Unknown";
-            Description = "Unknown";
-        }
-
         /// <summary>
         ///     Short name describing implementation. Used for UI/Demos where different implementations are available.
         /// </summary>
@@ -33,6 +25,44 @@ namespace NSrtm.Core
         /// </summary>
         [NotNull]
         public string Description { get; set; }
+
+        internal HgtElevationProvider([NotNull] IHgtDataCellFactory cellFactory)
+        {
+            if (cellFactory == null) throw new ArgumentNullException("cellFactory");
+            _cellFactory = cellFactory;
+            Name = "Unknown";
+            Description = "Unknown";
+        }
+
+        private async Task<double> buildAndCacheCellAndReturnElevationAsync(HgtCellCoords coords, double latitude, double longitude)
+        {
+            IHgtDataCell ret;
+            try
+            {
+                ret = await _cellFactory.GetCellForAsync(coords);
+            }
+            catch (HgtFileException)
+            {
+                ret = HgtDataCellInvalid.Invalid;
+            }
+
+            var cell = _cache.GetOrAdd(coords, ret);
+
+            return await cell.GetElevationAsync(latitude, longitude);
+        }
+
+        [NotNull]
+        private IHgtDataCell buildCellFor(HgtCellCoords coords)
+        {
+            try
+            {
+                return _cellFactory.GetCellFor(coords);
+            }
+            catch (HgtFileException)
+            {
+                return HgtDataCellInvalid.Invalid;
+            }
+        }
 
         /// <summary>
         ///     Gets elevation above MSL
@@ -72,35 +102,7 @@ namespace NSrtm.Core
 
         public Level ElevationTarget { get { return Level.Terrain; } }
 
-        private async Task<double> buildAndCacheCellAndReturnElevationAsync(HgtCellCoords coords, double latitude, double longitude)
-        {
-            IHgtDataCell ret;
-            try
-            {
-                ret = await _cellFactory.GetCellForAsync(coords);
-            }
-            catch (HgtFileException)
-            {
-                ret = HgtDataCellInvalid.Invalid;
-            }
-
-            var cell = _cache.GetOrAdd(coords, ret);
-
-            return await cell.GetElevationAsync(latitude, longitude);
-        }
-
-        [NotNull]
-        private IHgtDataCell buildCellFor(HgtCellCoords coords)
-        {
-            try
-            {
-                return _cellFactory.GetCellFor(coords);
-            }
-            catch (HgtFileException)
-            {
-                return HgtDataCellInvalid.Invalid;
-            }
-        }
+        #region Static Members
 
         /// <summary>
         ///     Creates elevation provider which loads HGT files to memory on demand.
@@ -154,5 +156,7 @@ namespace NSrtm.Core
                        Description = string.Format("Memory mapped SRTM files (HGT) from directory {0}", directory)
                    };
         }
+
+        #endregion
     }
 }

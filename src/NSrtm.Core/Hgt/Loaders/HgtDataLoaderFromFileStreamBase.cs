@@ -13,21 +13,6 @@ namespace NSrtm.Core
             _pathResolver = pathResolver;
         }
 
-        [NotNull]
-        public byte[] LoadFromFile(HgtCellCoords coords)
-        {
-            var filePath = _pathResolver.FindFilePath(coords);
-
-            return LoadHgtDataFromFile(coords, filePath);
-        }
-
-        public Task<byte[]> LoadFromFileAsync(HgtCellCoords coords)
-        {
-            var filePath = _pathResolver.FindFilePath(coords);
-
-            return LoadHgtDataFromFileAsync(coords, filePath);
-        }
-
         protected abstract byte[] LoadHgtDataFromFile(HgtCellCoords coords, [NotNull] string filePath);
         protected abstract Task<byte[]> LoadHgtDataFromFileAsync(HgtCellCoords coords, [NotNull] string filePath);
 
@@ -51,6 +36,21 @@ namespace NSrtm.Core
                 hgtData = memory.ToArray();
             }
             return hgtData;
+        }
+
+        [NotNull]
+        public byte[] LoadFromFile(HgtCellCoords coords)
+        {
+            var filePath = _pathResolver.FindFilePath(coords);
+
+            return LoadHgtDataFromFile(coords, filePath);
+        }
+
+        public Task<byte[]> LoadFromFileAsync(HgtCellCoords coords)
+        {
+            var filePath = _pathResolver.FindFilePath(coords);
+
+            return LoadHgtDataFromFileAsync(coords, filePath);
         }
     }
 }

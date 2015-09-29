@@ -4,7 +4,8 @@ namespace NSrtm.Core
 {
     internal class HgtPathResolverRaw : HgtPathResolverCaching
     {
-        public HgtPathResolverRaw([NotNull] string directory) : base(directory)
+        public HgtPathResolverRaw([NotNull] string directory)
+            : base(directory)
         {
         }
 

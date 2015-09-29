@@ -6,14 +6,9 @@ namespace NSrtm.Core
 {
     internal class HgtDataCellInvalid : IHgtDataCell
     {
-        private static readonly HgtDataCellInvalid invalid = new HgtDataCellInvalid();
-        private static readonly Task<double> invalidElevationTask = Task.FromResult(Double.NaN);
-
         private HgtDataCellInvalid()
         {
         }
-
-        [NotNull] public static HgtDataCellInvalid Invalid { get { return invalid; } }
 
         public double GetElevation(double latitude, double longitude)
         {
@@ -27,5 +22,15 @@ namespace NSrtm.Core
         {
             return invalidElevationTask;
         }
+
+        #region Static Members
+
+        private static readonly HgtDataCellInvalid invalid = new HgtDataCellInvalid();
+        private static readonly Task<double> invalidElevationTask = Task.FromResult(Double.NaN);
+
+        [NotNull]
+        public static HgtDataCellInvalid Invalid { get { return invalid; } }
+
+        #endregion
     }
 }

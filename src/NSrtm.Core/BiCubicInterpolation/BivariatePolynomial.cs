@@ -24,7 +24,7 @@ namespace NSrtm.Core.BicubicInterpolation
             {
                 if (coefficients == null) throw new ArgumentNullException("coefficients");
                 if (coefficients.Count != 16) throw new ArgumentException("Bivariate polynomial use 16 coefficients.", "coefficients");
-                _reversedCoefficients = coefficients.Select((c, i) => new { Index = i, value = c })
+                _reversedCoefficients = coefficients.Select((c, i) => new {Index = i, value = c})
                                                     .GroupBy(p => p.Index / 4)
                                                     .Select(c => c.Select(v => v.value)
                                                                   .Reverse()
@@ -36,7 +36,7 @@ namespace NSrtm.Core.BicubicInterpolation
             public double Evaluate(double x, double y)
             {
                 var hornersResultsTermsY = new double[4];
-                for (int i = 0; i<4; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     hornersResultsTermsY[i] = _reversedCoefficients[i].UseHornerScheme(y);
                 }
