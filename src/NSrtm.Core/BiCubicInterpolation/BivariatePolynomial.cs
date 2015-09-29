@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 
 namespace NSrtm.Core.BicubicInterpolation
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes",
+    [SuppressMessage("Microsoft.Performance",
+        "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes",
         Justification = "This value type would never be compared")]
     public struct BivariatePolynomial
     {
