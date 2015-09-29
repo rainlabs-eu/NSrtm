@@ -60,10 +60,10 @@ namespace NSrtm.Core.Pgm
         /// <returns></returns>
         public double GetElevation(double latitude, double longitude)
         {
-            var longitudeEgmDatum = longitude + 180;
-            var mainNode = PgmCellCoords.ForCoordinatesUsingDescription(latitude, longitudeEgmDatum, dataDescription);
+            var longitudeInEgmDatum = longitude + 180;
+            var mainNode = PgmCellCoords.ForCoordinatesUsingDescription(latitude, longitudeInEgmDatum, dataDescription);
             var interpolatedCell = _continuousSurface.GetOrAdd(mainNode, getInterpolationForCellSurface);
-            return interpolatedCell.Evaluate(latitude, longitudeEgmDatum);
+            return interpolatedCell.Evaluate(latitude, longitudeInEgmDatum);
         }
 
         public Task<double> GetElevationAsync(double latitude, double longitude)
