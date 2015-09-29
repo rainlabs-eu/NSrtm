@@ -59,9 +59,10 @@ namespace NSrtm.Core
         {
             var coords = HgtCellCoords.ForLatLon(latitude, longitude);
             IHgtDataCell cellFromCache;
+
             if (_cache.TryGetValue(coords, out cellFromCache))
             {
-                cellFromCache.GetElevationAsync(latitude, longitude);
+                return cellFromCache.GetElevationAsync(latitude, longitude);
             }
 
             return buildAndCacheCellAndReturnElevationAsync(coords, latitude, longitude);
