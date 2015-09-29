@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using NSrtm.Core.BicubicInterpolation.NSrtm.Core.BicubicInterpolation;
 
 namespace NSrtm.Core.BicubicInterpolation
 {
