@@ -77,9 +77,9 @@ namespace NSrtm.Core.Pgm
         internal static IEnumerable<PgmCellCoords> findCellAndSurroundingNodesCoords(PgmCellCoords pgmCellCoords, double latIncrement, double lonIncrement)
         {
             IEnumerable<double> horizontalNodes = Enumerable.Range(-1, 4)
-                                            .Select(step => pgmCellCoords.Lon + step * lonIncrement);
+                                                            .Select(step => pgmCellCoords.Lon + step * lonIncrement);
             IEnumerable<double> verticalNodes = Enumerable.Range(-1, 4)
-                                          .Select(step => pgmCellCoords.Lat + step * latIncrement);
+                                                          .Select(step => pgmCellCoords.Lat + step * latIncrement);
             return verticalNodes.SelectMany(lat => horizontalNodes.Select(lon => normalizeCoords(lat, lon)))
                                 .ToList();
         }
@@ -94,7 +94,7 @@ namespace NSrtm.Core.Pgm
         /// <param name="path"></param>
         /// <returns>Created provider.</returns>
         [NotNull]
-        public static IElevationProvider CreateWithStoredGridInMemory([NotNull] string path)
+        public static IElevationProvider CreateWithGridDataStoredInMemory([NotNull] string path)
         {
             var pgmGeoidUndulationMemory = PgmGeoidUndulationGridFactory.CreateGeoidUndulationGridInMemory(path);
             return new PgmElevationProvider(pgmGeoidUndulationMemory);
@@ -106,7 +106,7 @@ namespace NSrtm.Core.Pgm
         /// <param name="path"></param>
         /// <returns>Created provider.</returns>
         [NotNull]
-        public static IElevationProvider CreateDirectAccessToGrid([NotNull] string path)
+        public static IElevationProvider CreateWithDirectAccessToGridData([NotNull] string path)
         {
             var pgmGeoidUndulationFile = PgmGeoidUndulationGridFactory.CreateGeoidUndulationGridInFile(path);
             return new PgmElevationProvider(pgmGeoidUndulationFile);
