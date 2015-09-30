@@ -76,9 +76,9 @@ namespace NSrtm.Core.Pgm
 
         internal static IEnumerable<PgmCellCoords> findCellAndSurroundingNodesCoords(PgmCellCoords pgmCellCoords, double latIncrement, double lonIncrement)
         {
-            var horizontalNodes = Enumerable.Range(-1, 4)
+            IEnumerable<double> horizontalNodes = Enumerable.Range(-1, 4)
                                             .Select(step => pgmCellCoords.Lon + step * lonIncrement);
-            var verticalNodes = Enumerable.Range(-1, 4)
+            IEnumerable<double> verticalNodes = Enumerable.Range(-1, 4)
                                           .Select(step => pgmCellCoords.Lat + step * latIncrement);
             return verticalNodes.SelectMany(lat => horizontalNodes.Select(lon => normalizeCoords(lat, lon)))
                                 .ToList();
