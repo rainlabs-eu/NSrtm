@@ -39,7 +39,7 @@ namespace NSrtm.Core.Pgm
             return BicubicCalculator.GetSpline(values: formattedUndulations, step: dataDescription.LatitudeIncrementDegrees);
         }
 
-        private static PgmCellCoords normalizeCoords(double lat, double lon)
+        internal static PgmCellCoords normalizeCoords(double lat, double lon)
         {
             if (lat > 90 || lat < -90)
             {
