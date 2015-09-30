@@ -41,13 +41,19 @@ namespace NSrtm.Core.Pgm
 
         private static PgmCellCoords normalizeCoords(double lat, double lon)
         {
-            var normalizedLongitude = lat > 90 || lat < -90 ? lon + 180 : lon;
-            normalizedLongitude = (360 + (normalizedLongitude % 360)) % 360;
-
-            var absoluteLat = Math.Abs(Math.Abs(lat % 180) - 90);
-            var normalizedLatitude = lat > 0 ? 90 - absoluteLat : absoluteLat - 90;
-
-            return new PgmCellCoords(normalizedLatitude, normalizedLongitude);
+            if (lat > 90 || lat < -90)
+            {
+                var lonOnOtherSide = lon + 180;
+                var normalizedLongitude = (360 + (lonOnOtherSide % 360)) % 360;
+                var absoluteLat = Math.Abs(Math.Abs(lat % 180) - 90);
+                var normalizedLatitude = lat > 0 ? 90 - absoluteLat : absoluteLat - 90;
+                return new PgmCellCoords(normalizedLatitude, normalizedLongitude);
+            }
+            else
+            {
+                var normalizedLongitude = (360 + (lon % 360)) % 360;
+                return new PgmCellCoords(lat, normalizedLongitude);
+            }
         }
 
         /// <summary>
