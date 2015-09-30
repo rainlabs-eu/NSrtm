@@ -12,8 +12,7 @@ namespace NSrtm.Core.xTests
             PgmCellCoords coords,
             double latIncrement,
             double lonIncrement,
-            IEnumerable<PgmCellCoords>
-                expected)
+            IEnumerable<PgmCellCoords> expected)
         {
             var actual = PgmElevationProvider.findCellAndSurroundingNodesCoords(coords, latIncrement, lonIncrement);
             AssertDeep.Equal(actual, expected);
@@ -25,8 +24,7 @@ namespace NSrtm.Core.xTests
             PgmCellCoords coords,
             double latIncrement,
             double lonIncrement,
-            IEnumerable<PgmCellCoords>
-                expected)
+            IEnumerable<PgmCellCoords> expected)
         {
             var actual = PgmElevationProvider.findCellAndSurroundingNodesCoords(coords, latIncrement, lonIncrement);
             AssertDeep.Equal(actual, expected);
