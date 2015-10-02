@@ -13,6 +13,7 @@
         private readonly int _numberOfPoints;
         private readonly double _latitudeIncrementDegrees;
         private readonly double _longitudeIncrementDegrees;
+        private readonly Level _level;
 
         public PgmDataDescription(
             double offset,
@@ -22,7 +23,8 @@
             int gridGraphWidthPoints,
             int gridGraphHeightPoints,
             int maxValue,
-            int preambleLength)
+            int preambleLength,
+            Level level)
         {
             _offset = offset;
             _scale = scale;
@@ -32,6 +34,7 @@
             _gridGraphWidthPoints = gridGraphWidthPoints;
             _maxValue = maxValue;
             _preambleLength = preambleLength;
+            _level = level;
             _numberOfPoints = _gridGraphHeightPoints * _gridGraphWidthPoints;
             _longitudeIncrementDegrees = 360.0 / _gridGraphWidthPoints;
             _latitudeIncrementDegrees = 180.0 / (_gridGraphHeightPoints - 1);
@@ -48,5 +51,6 @@
         public int PreambleLength { get { return _preambleLength; } }
         public double LatitudeIncrementDegrees { get { return _latitudeIncrementDegrees; } }
         public double LongitudeIncrementDegrees { get { return _longitudeIncrementDegrees; } }
+        public Level Level { get { return _level; } }
     }
 }
