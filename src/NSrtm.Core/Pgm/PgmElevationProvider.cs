@@ -10,14 +10,14 @@ using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
 {
-    internal sealed class PgmElevationProvider : IElevationProvider
+    public sealed class PgmElevationProvider : IElevationProvider
     {
         private readonly IPgmGeoidUndulationGrid _discreteSurface;
 
         private readonly ConcurrentDictionary<PgmCellCoords, BivariatePolynomial> _continuousSurface =
             new ConcurrentDictionary<PgmCellCoords, BivariatePolynomial>();
 
-        public PgmElevationProvider([NotNull] IPgmGeoidUndulationGrid discreteSurface)
+        internal PgmElevationProvider([NotNull] IPgmGeoidUndulationGrid discreteSurface)
         {
             if (discreteSurface == null) throw new ArgumentNullException("discreteSurface");
             _discreteSurface = discreteSurface;
