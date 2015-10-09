@@ -75,8 +75,8 @@ namespace NSrtm.Core.Pgm
             return Task.FromResult(GetElevation(latitude, longitude));
         }
 
-        public Level ElevationBase { get { return dataDescription.Level; } }
-        public Level ElevationTarget { get { return Level.EllipsoidWgs84; } }
+        public Level ElevationBase { get { return Level.EllipsoidWgs84; } }
+        public Level ElevationTarget { get { return dataDescription.Level; } }
 
         #region Static Members
 
