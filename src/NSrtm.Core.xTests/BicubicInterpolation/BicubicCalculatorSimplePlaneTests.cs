@@ -66,10 +66,21 @@ namespace NSrtm.Core.xTests.BicubicInterpolation
                            {
                                new List<List<double>>
                                {
-                                   new List<double> {-10, -10, -10, -10},
-                                   new List<double> {-10, -10, -10, -10},
-                                   new List<double> {-10, -10, -10, -10},
-                                   new List<double> {-10, -10, -10, -10},
+                                   new List<double> {-0.5, -0.5, -0.5, -0.5},
+                                   new List<double> {-0.5, -0.5, -0.5, -0.5},
+                                   new List<double> {-0.5, -0.5, -0.5, -0.5},
+                                   new List<double> {-0.5, -0.5, -0.5, -0.5},
+                               },
+                               1
+                           },
+                           new object[]
+                           {
+                               new List<List<double>>
+                               {
+                                   new List<double> {0, 0, 0, 0},
+                                   new List<double> {0, 0, 0, 0},
+                                   new List<double> {0, 0, 0, 0},
+                                   new List<double> {0, 0, 0, 0},
                                },
                                1
                            }
