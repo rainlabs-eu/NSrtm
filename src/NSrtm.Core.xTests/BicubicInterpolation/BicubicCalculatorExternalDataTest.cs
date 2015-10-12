@@ -2,7 +2,7 @@
 using NSrtm.Core.BicubicInterpolation;
 using Xunit;
 
-namespace NSrtm.Core.xTests
+namespace NSrtm.Core.xTests.BicubicInterpolation
 {
     public class BicubicCalculatorExternalDataTest
     {
