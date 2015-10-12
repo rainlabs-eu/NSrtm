@@ -4,7 +4,7 @@ using Xunit;
 
 namespace NSrtm.Core.xTests
 {
-    public class Spline3DCalculatorExternalDataTest
+    public class BicubicCalculatorExternalDataTest
     {
         [Theory]
         [MemberData("ExternalData")]
