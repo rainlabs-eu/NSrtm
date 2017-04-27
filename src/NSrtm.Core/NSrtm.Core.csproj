@@ -67,6 +67,8 @@
     </Compile>
     <Compile Include="BicubicInterpolation\BivariatePolynomial.cs" />
     <Compile Include="BicubicInterpolation\BicubicCalculator.cs" />
+    <Compile Include="Composer\AddingComposerElevationProvider.cs" />
+    <Compile Include="CoordsValidator.cs" />
     <Compile Include="Hgt\DataCells\HgtDataCellInFileFactory.cs" />
     <Compile Include="Hgt\Loaders\HgtDataLoaderFromFileStreamBase.cs" />
     <Compile Include="Hgt\Utils\HgtCellCoords.cs" />
@@ -92,7 +94,8 @@
     <Compile Include="Pgm\Exceptions\InvalidFileTypeException.cs" />
     <Compile Include="Pgm\PgmCellCoords.cs" />
     <Compile Include="Pgm\PgmDataConverter.cs" />
-    <Compile Include="Pgm\PgmElevationProvider.cs" />
+    <Compile Include="Pgm\PgmElevationProviderNaive.cs" />
+    <Compile Include="Pgm\PgmElevationProviderBicubic.cs" />
     <Compile Include="Pgm\PgmGeoidUndulationGridFactory.cs" />
     <Compile Include="Pgm\DataDesciption\PgmDataDescription.cs" />
     <Compile Include="Pgm\GeoidUndulationGrid\PgmGeoidUndulationGridInFile.cs" />
