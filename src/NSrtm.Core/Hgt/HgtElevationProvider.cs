@@ -72,10 +72,10 @@ namespace NSrtm.Core
         /// <returns></returns>
         public double GetElevation(double latitude, double longitude)
         {
+            CoordsValidator.ThrowIfNotValidWgs84(latitude, longitude);
+
             var coords = HgtCellCoords.ForLatLon(latitude, longitude);
-
             var cell = _cache.GetOrAdd(coords, buildCellFor);
-
             return cell.GetElevation(latitude, longitude);
         }
 
