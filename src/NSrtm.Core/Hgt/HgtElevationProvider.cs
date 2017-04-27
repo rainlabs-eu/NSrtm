@@ -98,7 +98,7 @@ namespace NSrtm.Core
             return buildAndCacheCellAndReturnElevationAsync(coords, latitude, longitude);
         }
 
-        public Level ElevationBase { get { return Level.EllipsoidWgs84; } }
+        public Level ElevationBase { get { return Level.GeoidEgm96; } }
 
         public Level ElevationTarget { get { return Level.Terrain; } }
 
