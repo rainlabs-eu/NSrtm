@@ -42,21 +42,23 @@ namespace NSrtm.Core.BicubicInterpolation
             return coefficients;
         }
 
-        private static List<double> getParametersDescribingGrid(IReadOnlyList<IReadOnlyList<double>> values, double step)
+        private static List<double> getParametersDescribingGrid(IReadOnlyList<IReadOnlyList<double>> values)
         {
-            var firstDerivativeX = values.Select(row => numericalDifferentation(row, step))
+            const double pointsDistance = 1;
+
+            var firstDerivativeX = values.Select(row => numericalDifferentation(row, step: pointsDistance))
                                          .ToList()
                                          .AsReadOnly();
 
             var firstDerivativeY = values.Select((t, i) => values.Select(element => element[i]))
-                                         .Select(column => numericalDifferentation(column.ToList(), step))
+                                         .Select(column => numericalDifferentation(column.ToList(), step: pointsDistance))
                                          .ToList()
                                          .AsReadOnly();
             var crossDerivative = new List<List<double>>();
             for (int i = 0; i < firstDerivativeY[0].Count; i++)
             {
                 var col = firstDerivativeY.Select(p => p[i]);
-                crossDerivative.Add(numericalDifferentation(col.ToList(), step));
+                crossDerivative.Add(numericalDifferentation(col.ToList(), step: pointsDistance));
             }
 
             var x = new List<double>
@@ -105,23 +107,22 @@ namespace NSrtm.Core.BicubicInterpolation
 
         /// <summary>
         ///     This subroutine builds bicubic func spline.
+        ///     Normalized, interpolates range 0 to 1
         ///     For more information see https://en.wikipedia.org/wiki/Bicubic_interpolation
         /// </summary>
         /// <param name="values">function values,  (4×4)</param>
-        /// <param name="step">Distance between the nodes</param>
         /// <returns>Func with spline interpolant</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures",
             Justification = "This way of passing function values brings less misunderstandings")]
-        public static BivariatePolynomial GetSpline([NotNull] IReadOnlyList<IReadOnlyList<double>> values, double step)
+        public static BivariatePolynomial GetSpline([NotNull] IReadOnlyList<IReadOnlyList<double>> values)
         {
             if (values == null) throw new ArgumentNullException("values");
-            if (step <= 0) throw new ArgumentOutOfRangeException("step", "Step must be positive");
             if (values.Count != 4 || values.Any(value => value.Count != 4))
             {
                 throw new ArgumentException("Bicubic interpolation considers 16 elements(4×4)", "values");
             }
 
-            var x = getParametersDescribingGrid(values, step);
+            var x = getParametersDescribingGrid(values);
 
             var coefficients = getCoefficients(x);
 

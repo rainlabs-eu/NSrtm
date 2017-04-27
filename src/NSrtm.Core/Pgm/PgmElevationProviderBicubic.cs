@@ -36,7 +36,7 @@ namespace NSrtm.Core.Pgm
                                                        .Select(c => c.Select(v => v.value)
                                                                      .ToList())
                                                        .ToList();
-            return BicubicCalculator.GetSpline(values: formattedUndulations, step: dataDescription.LatitudeIncrementDegrees);
+            return BicubicCalculator.GetSpline(values: formattedUndulations);
         }
 
         internal static PgmCellCoords normalizeCoords(double lat, double lon)
