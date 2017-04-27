@@ -10,12 +10,11 @@ namespace NSrtm.Core.xTests
         [MemberData("ExternalData")]
         public void BicubicSplineCalculatorReturnSimilarResultToExternalData(
             List<List<double>> values,
-            double step,
             double xPosition,
             double yPosition,
             double expectedResult)
         {
-            var spline = BicubicCalculator.GetSpline(values, step);
+            var spline = BicubicCalculator.GetSpline(values);
             var result = spline.Evaluate( xPosition, yPosition);
             AssertDeep.Equal(result, expectedResult, config => config.DoublePrecision = 1e-1);
         }
@@ -37,7 +36,6 @@ namespace NSrtm.Core.xTests
                                    new List<double> {28, 29, 29, 30},
                                    new List<double> {26, 27, 28, 29},
                                },
-                               1,
                                0.55,
                                0.7,
                                29.5

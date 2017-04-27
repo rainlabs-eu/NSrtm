@@ -10,7 +10,7 @@ namespace NSrtm.Core.xTests
         [Fact]
         public void EmptyValuesContainerThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => BicubicCalculator.GetSpline(null, 1));
+            Assert.Throws<ArgumentNullException>(() => BicubicCalculator.GetSpline(null));
         }
 
         [Fact]
@@ -24,38 +24,7 @@ namespace NSrtm.Core.xTests
                                                                                          new List<double> {1, 2, 3, 4},
                                                                                          new List<double> {3, 4, 5, 6},
                                                                                          new List<double> {1, 2, 3}
-                                                                                     },
-                                                                                     1));
-        }
-
-        [Fact]
-        public void ZeroStepThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentOutOfRangeException>(
-                                                 () =>
-                                                 BicubicCalculator.GetSpline(
-                                                                                     new List<List<double>>
-                                                                                     {
-                                                                                         new List<double> {1, 2, 3, 4},
-                                                                                         new List<double> {3, 4, 5, 6},
-                                                                                         new List<double> {1, 2, 3}
-                                                                                     },
-                                                                                     0));
-        }
-
-        [Fact]
-        public void NegativeStepThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentOutOfRangeException>(
-                                                 () =>
-                                                 BicubicCalculator.GetSpline(
-                                                                                     new List<List<double>>
-                                                                                     {
-                                                                                         new List<double> {1, 2, 3, 4},
-                                                                                         new List<double> {3, 4, 5, 6},
-                                                                                         new List<double> {1, 2, 3}
-                                                                                     },
-                                                                                     -1));
+                                                                                     }));
         }
     }
 }
