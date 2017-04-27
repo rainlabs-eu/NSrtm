@@ -16,17 +16,13 @@ namespace NSrtm.Core.Pgm
 
         public static int CoordinatesToClosestGridPosition(double latitude, double longitude, PgmDataDescription dataDescription)
         {
-            if (dataDescription.OriginLat != 90 || dataDescription.OriginLon != 0)
-            {
-                throw new ArgumentOutOfRangeException("dataDescription",
-                                                      String.Format("Coordinates of the origin are {0} {1}, but should be 90 0.",
-                                                                    dataDescription.OriginLat,
-                                                                    dataDescription.OriginLon));
-            }
+            validatePgmDataDescription(dataDescription);
 
-            var gridAbsoluteLat = (dataDescription.OriginLat - latitude) * dataDescription.LatitudeIncrementDegrees;
+            var longitude0To360 = (longitude + 360) % 360;
+
+            var gridAbsoluteLat = (dataDescription.OriginLat - latitude) / dataDescription.LatitudeIncrementDegrees;
             int closestAccessibleGridLat = (int)Math.Round(gridAbsoluteLat);
-            var gridAbsoluteLon = (longitude - dataDescription.OriginLon) * dataDescription.LongitudeIncrementDegrees;
+            var gridAbsoluteLon = (longitude0To360 - dataDescription.OriginLon) / dataDescription.LongitudeIncrementDegrees;
             int closestAccessibleGridLon = (int)Math.Round(gridAbsoluteLon);
             int closestAccessiblePosition = (closestAccessibleGridLon + closestAccessibleGridLat * dataDescription.GridGraphWidthPoints);
 
@@ -35,6 +31,23 @@ namespace NSrtm.Core.Pgm
                                                                   latitude,
                                                                   longitude));
             return closestAccessiblePosition;
+        }
+
+        private static void validatePgmDataDescription(PgmDataDescription dataDescription)
+        {
+            if (dataDescription.OriginLat != 90 || dataDescription.OriginLon != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(dataDescription),
+                    String.Format("Coordinates of the origin are {0} {1}, but should be 90 0.",
+                        dataDescription.OriginLat,
+                        dataDescription.OriginLon));
+            }
+
+            if (dataDescription.MaxValue <= byte.MaxValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(dataDescription),
+                    String.Format($"Max value of {dataDescription.MaxValue} indicates that data uses one byte per pixel. This mode is not supported"));
+            }
         }
     }
 }

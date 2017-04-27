@@ -14,7 +14,7 @@ namespace NSrtm.Core.xTests
             double lonIncrement,
             IEnumerable<PgmCellCoords> expected)
         {
-            var actual = PgmElevationProvider.findCellAndSurroundingNodesCoords(coords, latIncrement, lonIncrement);
+            var actual = PgmElevationProviderBicubic.findCellAndSurroundingNodesCoords(coords, latIncrement, lonIncrement);
             AssertDeep.Equal(actual, expected);
         }
 
@@ -26,7 +26,7 @@ namespace NSrtm.Core.xTests
             double lonIncrement,
             IEnumerable<PgmCellCoords> expected)
         {
-            var actual = PgmElevationProvider.findCellAndSurroundingNodesCoords(coords, latIncrement, lonIncrement);
+            var actual = PgmElevationProviderBicubic.findCellAndSurroundingNodesCoords(coords, latIncrement, lonIncrement);
             AssertDeep.Equal(actual, expected);
         }
 

@@ -14,7 +14,7 @@ namespace NSrtm.Core.xTests
         [MemberData("NormalizedCoordinates")]
         internal void NormalizationWorksCorrectlyForNormalizedData(PgmCellCoords inputCoords, PgmCellCoords expectedCoords)
         {
-            var actual = PgmElevationProvider.normalizeCoords(inputCoords.Lat, inputCoords.Lon);
+            var actual = PgmElevationProviderBicubic.normalizeCoords(inputCoords.Lat, inputCoords.Lon);
             AssertDeep.Equal(actual, expectedCoords, config => config.DoublePrecision = 1e-5);
         }
 
@@ -22,7 +22,7 @@ namespace NSrtm.Core.xTests
         [MemberData("NonNormalizedCoordinates")]
         internal void NormalizationWorksCorrectlyForNonNormalizedData(PgmCellCoords inputCoords, PgmCellCoords expectedCoords)
         {
-            var actual = PgmElevationProvider.normalizeCoords(inputCoords.Lat, inputCoords.Lon);
+            var actual = PgmElevationProviderBicubic.normalizeCoords(inputCoords.Lat, inputCoords.Lon);
             AssertDeep.Equal(actual, expectedCoords, config => config.DoublePrecision = 1e-5);
         }
 

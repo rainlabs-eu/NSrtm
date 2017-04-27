@@ -10,14 +10,14 @@ using NSrtm.Core.Pgm.GeoidUndulationGrid;
 
 namespace NSrtm.Core.Pgm
 {
-    public sealed class PgmElevationProvider : IElevationProvider
+    public sealed class PgmElevationProviderBicubic : IElevationProvider
     {
         private readonly IPgmGeoidUndulationGrid _discreteSurface;
 
         private readonly ConcurrentDictionary<PgmCellCoords, BivariatePolynomial> _continuousSurface =
             new ConcurrentDictionary<PgmCellCoords, BivariatePolynomial>();
 
-        internal PgmElevationProvider([NotNull] IPgmGeoidUndulationGrid discreteSurface)
+        internal PgmElevationProviderBicubic([NotNull] IPgmGeoidUndulationGrid discreteSurface)
         {
             if (discreteSurface == null) throw new ArgumentNullException("discreteSurface");
             _discreteSurface = discreteSurface;
@@ -64,10 +64,23 @@ namespace NSrtm.Core.Pgm
         /// <returns></returns>
         public double GetElevation(double latitude, double longitude)
         {
-            var longitudeInEgmDatum = longitude + 180;
-            var mainNode = PgmCellCoords.ForCoordinatesUsingDescription(latitude, longitudeInEgmDatum, dataDescription);
-            var interpolatedCell = _continuousSurface.GetOrAdd(mainNode, getInterpolationForCellSurface);
-            return interpolatedCell.Evaluate(latitude, longitudeInEgmDatum);
+            CoordsValidator.ThrowIfNotValidWgs84(latitude, longitude);
+
+            var cellCoords = PgmCellCoords.ForCoordinatesUsingDescription(latitude, longitude, dataDescription);
+            var interpolatedCell = _continuousSurface.GetOrAdd(cellCoords, getInterpolationForCellSurface);
+            var coordsWithinCell = calculateUnitCoordsWithinCell(cellCoords, latitude, longitude);
+            return interpolatedCell.Evaluate(coordsWithinCell.Item1, coordsWithinCell.Item2);
+        }
+
+        private Tuple<double, double> calculateUnitCoordsWithinCell(PgmCellCoords cellCoords, double latitude, double longitude)
+        {
+            double offsetLat = latitude - cellCoords.Lat;
+            double offsetLon = longitude - cellCoords.Lon;
+
+            double scaledOffsetLat = offsetLat / dataDescription.LatitudeIncrementDegrees;
+            double scaledOffsetLon = offsetLon / dataDescription.LongitudeIncrementDegrees;
+
+            return Tuple.Create(scaledOffsetLat, scaledOffsetLon);
         }
 
         public Task<double> GetElevationAsync(double latitude, double longitude)
@@ -103,7 +116,7 @@ namespace NSrtm.Core.Pgm
         public static IElevationProvider CreateWithGridDataStoredInMemory([NotNull] string path)
         {
             var pgmGeoidUndulationMemory = PgmGeoidUndulationGridFactory.CreateGeoidUndulationGridInMemory(path);
-            return new PgmElevationProvider(pgmGeoidUndulationMemory);
+            return new PgmElevationProviderBicubic(pgmGeoidUndulationMemory);
         }
 
         /// <summary>
@@ -115,7 +128,7 @@ namespace NSrtm.Core.Pgm
         public static IElevationProvider CreateWithDirectAccessToGridData([NotNull] string path)
         {
             var pgmGeoidUndulationFile = PgmGeoidUndulationGridFactory.CreateGeoidUndulationGridInFile(path);
-            return new PgmElevationProvider(pgmGeoidUndulationFile);
+            return new PgmElevationProviderBicubic(pgmGeoidUndulationFile);
         }
 
         #endregion Provider creation
